@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+<ul>
+    <li><a href="{% url 'add_medicine' %}">Add Medicine</a></li>
+    <li><a href="{% url 'low_stock' %}">View Low Stock</a></li>
+    <li><a href="{% url 'available_stock' %}">View Available Stock</a></li>
+</ul>
+{% endblock %}

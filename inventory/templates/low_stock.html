@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Low Stock Medicines</h1>
+{% if medications %}
+    <ul>
+        {% for med in medications %}
+        <li>{{ med.name }}: {{ med.quantity }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No medicines with low stock!</p>
+{% endif %}
+{% endblock %}
