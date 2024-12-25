@@ -10,10 +10,26 @@
                 <div class="card-body">
                     <div class="text-center mb-4">
                         <h1>Available Stock</h1>
-                        <p class="lead">A list of all medications currently in stock.</p>
+                        <p class="lead">Categorized by Company Name.</p>
                     </div>
 
+                    <!-- Search Bar -->
+                    <form method="GET" action="{% url 'available_stock' %}" class="mb-4">
+                        <div class="input-group">
+                            <input 
+                                type="text" 
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Search by medication name..." 
+                                value="{{ search_query }}" 
+                                aria-label="Search">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+
                     <!-- Table for Available Stock -->
+                    {% for company, medications in grouped_medications.items %}
+                    <h3 class="mt-4">{{ company }}</h3>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead class="thead-dark">
@@ -38,10 +54,10 @@
                             </tbody>
                         </table>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
-    

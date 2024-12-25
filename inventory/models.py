@@ -5,12 +5,13 @@ class Medication(models.Model):
     quantity = models.IntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateField(null=True, blank=True)  # New field for expiry date
+    company_name = models.CharField(max_length=255, default="Unknown")  # Add this field
 
     def __str__(self):
         return self.name
     
 class Patient(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=255)
     age = models.IntegerField()
     contact = models.CharField(max_length=15, blank=True, null=True)
 

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Medication, Patient, DispensedMedication
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from itertools import groupby
 
 def user_login(request):
     if request.method == 'POST':
@@ -50,8 +51,22 @@ def low_stock(request):
 
 
 def available_stock(request):
-    medications = Medication.objects.filter(quantity__gt=0)  # Fetch medications with quantity > 0
-    return render(request, "available_stock.html", {"medications": medications})
+    query = request.GET.get("search", "")  # Get the search query
+    if query:
+        medications = Medication.objects.filter(name__icontains=query, quantity__gt=0)
+    else:
+        medications = Medication.objects.filter(quantity__gt=0)
+
+    # Group medications by company name
+    grouped_medications = {}
+    for company_name, meds in groupby(medications.order_by("company_name"), key=lambda x: x.company_name):
+        grouped_medications[company_name] = list(meds)
+
+    return render(
+        request,
+        "available_stock.html",
+        {"grouped_medications": grouped_medications, "search_query": query},
+    )
 
 def medication_list(request):
     medications = Medication.objects.all()
