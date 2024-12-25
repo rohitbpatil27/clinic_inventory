@@ -1,9 +1,32 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Dashboard</h1>
-<ul>
-    <li><a href="{% url 'add_medicine' %}">Add Medicine</a></li>
-    <li><a href="{% url 'low_stock' %}">View Low Stock</a></li>
-    <li><a href="{% url 'available_stock' %}">View Available Stock</a></li>
-</ul>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="list-group">
+                <a href="{% url 'add_medicine' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    Add Medicine
+                    <span class="badge bg-primary rounded-pill">New</span>
+                </a>
+                <a href="{% url 'low_stock' %}" class="list-group-item list-group-item-action">
+                    View Low Stock
+                </a>
+                <a href="{% url 'available_stock' %}" class="list-group-item list-group-item-action">
+                    View Available Stock
+                </a>
+                <a href="{% url 'dispense_medication' %}" class="list-group-item list-group-item-action">
+                    Dispense Medications
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h4 class="mb-3">Welcome to the Dashboard</h4>
+            <p class="lead">You can manage your clinic's inventory here. Select any option from the list to proceed.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

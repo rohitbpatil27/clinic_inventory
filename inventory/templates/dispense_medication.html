@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Dispense Medication{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center">
+                <h1 class="text-primary">Dispense Medication</h1>
+                <p class="lead text-muted">Select a patient and medication to dispense the required dosage.</p>
+            </div>
+
+            <!-- Add Patient Section -->
+            <div class="card p-3 mb-4">
+                <h3>Add New Patient</h3>
+                <form id="add-patient-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="new-patient-name">Name:</label>
+                        <input type="text" id="new-patient-name" name="name" class="form-control" placeholder="Patient Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-patient-age">Age:</label>
+                        <input type="number" id="new-patient-age" name="age" class="form-control" min="1" placeholder="Patient Age" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="new-patient-contact">Contact (Optional):</label>
+                        <input type="text" id="new-patient-contact" name="contact" class="form-control" placeholder="Patient Contact">
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-block">Add Patient</button>
+                </form>
+                <div id="add-patient-status" class="mt-2"></div>
+            </div>
+
+            <!-- Spacer -->
+            <div class="my-5"></div>
+
+            <!-- Dispense Medication Form -->
+            <div class="card p-3 mb-4">
+                <h3>Dispense Medication</h3>
+                <form id="dispense-form" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="patient">Select Patient:</label>
+                        <select name="patient_id" id="patient" class="form-control" required>
+                            <option value="" disabled selected>Choose a patient</option>
+                            {% for patient in patients %}
+                                <option value="{{ patient.id }}">{{ patient.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medication">Select Medication:</label>
+                        <select name="medication_id" id="medication" class="form-control" required>
+                            <option value="" disabled selected>Choose a medication</option>
+                            {% for medication in medications %}
+                                <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control" min="1" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Dispense</button>
+                </form>
+                <div id="status-message" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Patient via AJAX
+    document.getElementById('add-patient-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append("action", "add_patient");
+
+        fetch("", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            const statusDiv = document.getElementById("add-patient-status");
+            if (data.status === "success") {
+                // Add new patient to the dropdown
+                const patientDropdown = document.getElementById("patient");
+                const newOption = document.createElement("option");
+                newOption.value = data.patient_id;
+                newOption.textContent = data.patient_name;
+                patientDropdown.appendChild(newOption);
+
+                statusDiv.textContent = "Patient added successfully!";
+                statusDiv.style.color = "green";
+
+                // Reset the form
+                document.getElementById("add-patient-form").reset();
+            } else {
+                statusDiv.textContent = data.message || "Failed to add patient.";
+                statusDiv.style.color = "red";
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+
+    // Dispense Medication via AJAX
+    document.getElementById('dispense-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        formData.append("action", "dispense_medication");
+
+        fetch("", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            const statusMessage = document.getElementById("status-message");
+            if (data.status === "success") {
+                statusMessage.textContent = data.message;
+                statusMessage.style.color = "green";
+            } else {
+                statusMessage.textContent = data.message;
+                statusMessage.style.color = "red";
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+    });
+</script>
+{% endblock %}

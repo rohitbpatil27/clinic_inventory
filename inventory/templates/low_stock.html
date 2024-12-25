@@ -1,13 +1,35 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Low Stock Medicines</h1>
+<div class="text-center mt-4">
+    <h1>Low Stock Medicines</h1>
+    <p class="lead">Below are the medicines running low on stock. Please replenish them soon.</p>
+</div>
+
 {% if medications %}
-    <ul>
-        {% for med in medications %}
-        <li>{{ med.name }}: {{ med.quantity }}</li>
-        {% endfor %}
-    </ul>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Medication Name</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for medication in medications %}
+                    <tr>
+                        <td>{{ medication.name }}</td>
+                        <td>{{ medication.quantity }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" class="text-center">No low stock medicines available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% else %}
-    <p>No medicines with low stock!</p>
+    <p class="text-center mt-4">No medicines with low stock!</p>
 {% endif %}
 {% endblock %}

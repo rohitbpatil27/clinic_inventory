@@ -1,30 +1,47 @@
 {% extends "base.html" %}
+
 {% block title %}Available Stock{% endblock %}
 
 {% block content %}
-<div class="text-center">
-    <h1>Available Stock</h1>
-    <p class="lead">A list of all medications currently in stock.</p>
-</div>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h1>Available Stock</h1>
+                        <p class="lead">A list of all medications currently in stock.</p>
+                    </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="thead-dark">
-        <tr>
-            <th>Medication Name</th>
-            <th>Quantity</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for medication in medications %}
-        <tr>
-            <td>{{ medication.name }}</td>
-            <td>{{ medication.quantity }}</td> <!-- Use 'quantity' instead of 'stock' -->
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2" class="text-center">No medications available.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+                    <!-- Table for Available Stock -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Medication Name</th>
+                                    <th>Quantity</th>
+                                    <th>Added Date/Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medication in medications %}
+                                <tr>
+                                    <td>{{ medication.name }}</td>
+                                    <td>{{ medication.quantity }}</td>
+                                    <td>{{ medication.date_added }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No medications available.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
+    
