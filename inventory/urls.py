@@ -9,4 +9,8 @@ urlpatterns = [
     path('low_stock/', views.low_stock, name='low_stock'),
     path('available_stock/', views.available_stock, name='available_stock'),
     path('dispense_medication/', views.dispense_medication_view, name='dispense_medication_view'),
+    path('patient_details/', views.patient_details, name='patient_details'),
+    path('add_patient/', views.add_patient, name='add_patient'),
+    path('edit_patient/<int:id>/', views.edit_patient, name='edit_patient'),
+    path('delete_patient/<int:id>/', views.delete_patient, name='delete_patient'),
 ]

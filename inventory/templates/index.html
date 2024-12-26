@@ -4,35 +4,67 @@
 
 {% block content %}
 <div class="text-center mt-4">
-    <h1>Welcome to the Skinmitra Clinic Inventory</h1>
-    <p class="lead">Manage your inventory efficiently and stay updated with stock levels.</p>
+    <h1 class="display-4 text-primary">Welcome to the Skinmitra Clinic Inventory</h1>
+    <p class="lead text-muted">Manage your inventory efficiently and stay updated with stock levels.</p>
 </div>
 
-<div class="row mt-5">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
+<div class="row mt-5 justify-content-center">
+    <!-- Available Stock -->
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-boxes fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Available Stock</h5>
-                <p class="card-text">View the list of all medicines currently in stock.</p>
+                <p class="card-text text-muted">View the list of all medicines currently in stock.</p>
                 <a href="/available_stock/" class="btn btn-primary btn-block">View Stock</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title text-warning">Low Stock</h5>
-                <p class="card-text">Check medicines running low on stock to replenish them.</p>
-                <a href="/low_stock/" class="btn btn-danger btn-block">View Low Stock</a>
+
+    <!-- Low Stock -->
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-exclamation-triangle fa-2x mb-3"></i></h5>
+                <h5 class="card-title text-primary">Low Stock</h5>
+                <p class="card-text text-muted">Check medicines running low on stock to replenish them.</p>
+                <a href="/low_stock/" class="btn btn-primary btn-block">View Low Stock</a>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title text-success">Dispense Medication</h5>
-                <p class="card-text">Dispense medication to patients and manage inventory updates.</p>
-                <a href="/dispense_medication/" class="btn btn-success btn-block">Dispense Medication</a>
+
+    <!-- Add Medicine -->
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-plus-circle fa-2x mb-3"></i></h5>
+                <h5 class="card-title text-primary">Add Medicine</h5>
+                <p class="card-text text-muted">Add medications to the inventory.</p>
+                <a href="/add_medicine/" class="btn btn-primary btn-block">Add Medicine</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Patient Details -->
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-users fa-2x mb-3"></i></h5>
+                <h5 class="card-title text-primary">Patient Details</h5>
+                <p class="card-text text-muted">Add, update, or view patient details in the inventory.</p>
+                <a href="/patient_details/" class="btn btn-primary btn-block">Patient Details</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dispense Medication -->
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card">
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-pills fa-2x mb-3"></i></h5>
+                <h5 class="card-title text-primary">Dispense Medication</h5>
+                <p class="card-text text-muted">Dispense medication to patients and manage inventory updates.</p>
+                <a href="/dispense_medication/" class="btn btn-primary btn-block">Dispense Medication</a>
             </div>
         </div>
     </div>
