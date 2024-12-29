@@ -156,9 +156,10 @@ def add_patient(request):
         name = request.POST.get("name")
         age = request.POST.get("age")
         contact = request.POST.get("contact", "")
+        diagnosis = request.POST.get("diagnosis", "")  # Handle diagnosis field
         
         if name and age:
-            patient = Patient.objects.create(name=name, age=age, contact=contact)
+            patient = Patient.objects.create(name=name, age=age, contact=contact, diagnosis=diagnosis)
             messages.success(request, f"Patient {name} added successfully!")
             return redirect('patient_details')  # Use redirect to prevent resubmission
         else:
@@ -172,6 +173,7 @@ def edit_patient(request, id):
         patient.name = request.POST.get("name")
         patient.age = request.POST.get("age")
         patient.contact = request.POST.get("contact", "")
+        patient.diagnosis = request.POST.get("diagnosis", "")  # Handle diagnosis field
         patient.save()
         messages.success(request, f"Patient {patient.name} updated successfully.")
         return redirect('patient_details')

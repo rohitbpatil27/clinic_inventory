@@ -30,6 +30,7 @@
                                 <th>Name</th>
                                 <th>Age</th>
                                 <th>Contact</th>
+                                <th>Diagnosis</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -39,6 +40,7 @@
                                 <td>{{ patient.name }}</td>
                                 <td>{{ patient.age }}</td>
                                 <td>{{ patient.contact }}</td>
+                                <td>{{ patient.diagnosis|default:"Not Added" }}</td> <!-- Display "Not Added" if empty -->
                                 <td>
                                     <!-- Trigger Edit Modal -->
                                     <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editPatientModal{{ patient.id }}">Edit</button>
@@ -79,6 +81,10 @@
                                     <label for="contact">Contact (Optional):</label>
                                     <input type="text" id="contact" name="contact" class="form-control" placeholder="Patient Contact">
                                 </div>
+                                <div class="form-group">
+                                    <label for="diagnosis">Diagnosis (Optional):</label>
+                                    <textarea id="diagnosis" name="diagnosis" class="form-control" placeholder="Patient Diagnosis"></textarea>
+                                </div>                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -115,6 +121,10 @@
                                     <label for="contact">Contact:</label>
                                     <input type="text" id="contact" name="contact" class="form-control" value="{{ patient.contact }}"/>
                                 </div>
+                                <div class="form-group">
+                                    <label for="diagnosis">Diagnosis:</label>
+                                    <textarea id="diagnosis" name="diagnosis" class="form-control">{{ patient.diagnosis }}</textarea>
+                                </div>                                
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
