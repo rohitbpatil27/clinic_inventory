@@ -5,7 +5,12 @@ from django.contrib.auth.decorators import login_required
 from .models import Medication, Patient, DispensedMedication
 from django.contrib import messages
 from itertools import groupby
-from django.http import JsonResponse
+from django.http import FileResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import json
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -41,14 +46,12 @@ def add_medicine(request):
         name = request.POST.get("name")
         company_name = request.POST.get("company_name")  # Capture company name from form
         quantity = int(request.POST.get("quantity"))
-        expiry_date = request.POST.get("expiry_date")  # Capture expiry date from form
 
         # Save the medicine to the database
         Medication.objects.create(
             name=name,
             company_name=company_name,
             quantity=quantity,
-            expiry_date=expiry_date
         )
         
         messages.success(request, "Medicine added successfully!")
@@ -185,3 +188,4 @@ def delete_patient(request, id):
     patient.delete()
     messages.success(request, "Patient deleted successfully.")
     return redirect('patient_details')
+

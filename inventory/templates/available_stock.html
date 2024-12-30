@@ -9,9 +9,9 @@
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
-                        <h1 style="color: #ee9ca7;">Available Stock</h1>
-                        <p class="lead" style="color: #495057;">Categorized by Company Name</p>
-                        <hr style="border: 1px solid #ffdde1;">
+                        <h1 class="available-stock-heading">Available Stock</h1>
+                        <p class="lead-text">Categorized by Company Name</p>
+                        <hr class="hr-style">
                     </div>
 
                     <!-- Search Bar -->
@@ -24,20 +24,20 @@
                                 placeholder="Search by medication name..." 
                                 value="{{ search_query }}" 
                                 aria-label="Search">
-                            <button class="btn btn-primary" type="submit" style="background-color: #ee9ca7; border: none;">Search</button>
+                            <button class="btn btn-custom" type="submit">Search</button>
                         </div>
                     </form>
 
                     <!-- Table for Available Stock -->
                     {% for company, medications in grouped_medications.items %}
-                    <h3 class="mt-4" style="color: #ee9ca7;">{{ company }}</h3>
+                    <h3 class="mt-4 available-stock-heading">{{ company }}</h3>
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover shadow-sm">
-                            <thead style="background-color: #ffdde1;">
+                            <thead class="table-heading">
                                 <tr>
-                                    <th style="color: #495057;">Medication Name</th>
-                                    <th style="color: #495057;">Quantity</th>
-                                    <th style="color: #495057;">Added Date/Time</th>
+                                    <th>Medication Name</th>
+                                    <th>Quantity</th>
+                                    <th>Added Date/Time</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,7 +49,7 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="3" class="text-center" style="color: #ee9ca7;">No medications available.</td>
+                                    <td colspan="3" class="text-center-custom">No medications available.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

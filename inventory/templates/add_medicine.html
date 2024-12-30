@@ -8,8 +8,8 @@
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
-                    <h1 class="text-center" style="color: #ee9ca7;">Add Medicine</h1>
-                    <hr class="mb-4" style="border: 1px solid #ffdde1;">
+                    <h1 class="text-center add-medicine-heading">Add Medicine</h1>
+                    <hr class="hr-style mb-4">
 
                     <!-- Display success messages -->
                     {% if messages %}
@@ -26,23 +26,19 @@
                     <form method="POST" class="mt-4">
                         {% csrf_token %}
                         <div class="form-group">
-                            <label for="name" style="font-weight: bold; color: #495057;">Medicine Name:</label>
+                            <label for="name" class="form-label">Medicine Name:</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Enter the medicine name" required>
                         </div>
                         <div class="form-group mt-3">
-                            <label for="quantity" style="font-weight: bold; color: #495057;">Quantity:</label>
+                            <label for="quantity" class="form-label">Quantity:</label>
                             <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Enter the quantity" required>
                         </div>
                         <div class="form-group mt-3">
-                            <label for="expiry_date" style="font-weight: bold; color: #495057;">Expiry Date:</label>
-                            <input type="date" id="expiry_date" name="expiry_date" class="form-control" required>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label for="company_name" style="font-weight: bold; color: #495057;">Company Name:</label>
+                            <label for="company_name" class="form-label">Company Name:</label>
                             <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Enter the company name" required>
                         </div>
                         <div class="form-group mt-4 text-center">
-                            <button type="submit" class="btn btn-primary btn-lg w-100" style="background-color: #ee9ca7; border: none;">Add Medicine</button>
+                            <button type="submit" class="btn btn-submit btn-lg">Add Medicine</button>
                         </div>
                     </form>
                 </div>

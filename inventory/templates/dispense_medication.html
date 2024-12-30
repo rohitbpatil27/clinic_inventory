@@ -7,19 +7,18 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="text-center">
-                <h1 style="color: #ee9ca7;">Dispense Medication</h1>
-                <p class="lead" style="color: #495057;">Select a patient and medications to dispense the required dosages.</p>
-                <hr style="border: 1px solid #ffdde1;">
+                <h1 class="dispense-medication-heading">Dispense Medication</h1>
+                <p class="lead-text">Select a patient and medications to dispense the required dosages.</p>
+                <hr class="hr-style">
             </div>
-
             <!-- Dispense Medication Form -->
             <div class="card shadow-lg border-0 p-4">
-                <h3 style="color: #ee9ca7;">Dispense Medications</h3>
+                <h3 class="dispense-medication-heading">Dispense Medications</h3>
                 <form id="dispense-form" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="dispense_medication">
                     <div class="form-group mt-3">
-                        <label for="patient" style="color: #495057;">Select Patient:</label>
+                        <label for="patient" class="form-label">Select Patient:</label>
                         <select name="patient_id" id="patient" class="form-control shadow-sm" required>
                             <option value="" disabled selected>Choose a patient</option>
                             {% for patient in patients %}
@@ -34,7 +33,7 @@
 
                     <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
 
-                    <button type="submit" class="btn btn-primary btn-block mt-4" style="background-color: #ee9ca7; border: none;">Dispense Medications</button>
+                    <button type="submit" class="btn btn-submit btn-block mt-4">Dispense Medications</button>
                 </form>
                 <div id="status-message" class="mt-3"></div>
             </div>
@@ -47,7 +46,7 @@
     document.getElementById('add-medication').addEventListener('click', function() {
         const medicationFieldHTML = `
             <div class="form-group mt-3 medication-field">
-                <label for="medication" style="color: #495057;">Select Medication:</label>
+                <label for="medication" class="form-label">Select Medication:</label>
                 <select name="medications[]" class="form-control shadow-sm" required>
                     <option value="" disabled selected>Choose a medication</option>
                     {% for medication in medications %}
@@ -55,7 +54,7 @@
                     {% endfor %}
                 </select>
 
-                <label for="quantity" style="color: #495057;">Quantity:</label>
+                <label for="quantity" class="form-label">Quantity:</label>
                 <input type="number" name="quantities[]" class="form-control shadow-sm" min="1" required placeholder="Enter quantity" />
             </div>
         `;

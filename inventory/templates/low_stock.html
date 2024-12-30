@@ -9,19 +9,19 @@
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
-                        <h1 style="color: #ee9ca7;">Low Stock Medicines</h1>
-                        <p class="lead" style="color: #495057;">These are the medicines running low on stock. Please replenish them soon.</p>
-                        <hr style="border: 1px solid #ffdde1;">
+                        <h1 class="low-stock-heading">Low Stock Medicines</h1>
+                        <p class="lead-text">These are the medicines running low on stock. Please replenish them soon.</p>
+                        <hr class="hr-style">
                     </div>
 
                     <!-- Table for Low Stock -->
                     {% if medications %}
                     <div class="table-responsive mt-4">
                         <table class="table table-bordered table-hover shadow-sm">
-                            <thead style="background-color: #ffdde1;">
+                            <thead class="table-heading">
                                 <tr>
-                                    <th style="color: #495057;">Medication Name</th>
-                                    <th style="color: #495057;">Quantity</th>
+                                    <th>Medication Name</th>
+                                    <th>Quantity</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -32,14 +32,14 @@
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="2" class="text-center" style="color: #ee9ca7;">No low stock medicines available.</td>
+                                    <td colspan="2" class="text-center-custom">No low stock medicines available.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-center mt-4" style="color: #ee9ca7;">No medicines with low stock!</p>
+                    <p class="text-center-custom mt-4">No medicines with low stock!</p>
                     {% endif %}
                 </div>
             </div>

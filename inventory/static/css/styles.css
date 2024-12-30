@@ -1,7 +1,157 @@
-body {
-    font-family: Arial, sans-serif;
+/* Custom styling for navigation */
+.navbar {
+    background-color: #f8c8d1; /* Light pink background */
+    border-bottom: 1px solid #e0e0e0;
 }
 
-h1 {
+.navbar-brand {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #b24a6e; /* Darker pink for brand */
+    font-family: 'Roboto', sans-serif;
+}
+
+.navbar-brand:hover {
+    color: #b24a6e; /* Darker pink on hover */
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.2rem;
+    color: #d86d8f; /* Pink for links */
+    font-family: 'Roboto', sans-serif;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #b24a6e; /* Darker pink on hover */
+    font-weight: bold;
+}
+
+.navbar-toggler {
+    border-color: #ddd;
+}
+
+.navbar-nav .nav-item {
+    margin-right: 20px;
+}
+
+/* Custom styling for page content */
+body {
+    background-color: #f9f9f9; /* Light background */
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    padding-top: 30px;
+}
+
+.card {
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    background-color: #f8f8f8; /* Light background for card body */
+}
+
+.card-header {
+    background-color: #f1f1f1;
+    color: #333;
+    font-size: 1.25rem;
+    font-weight: bold;
     text-align: center;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.card-title {
+    color: #d86d8f !important; /* Custom pink color */
+}
+
+/* Table custom styling */
+.table {
+    background-color: #fff; /* White background for table */
+}
+
+.table-heading {
+    background-color: #f8c8d1; /* Light pink header */
+    color: #333; /* Dark text for readability */
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Heading and text styles */
+.available-stock-heading, .low-stock-heading, .add-medicine-heading, .dispense-medication-heading {
+    color: #d86d8f; /* Light pink for headings */
+    font-size: 2.5rem;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 20px;
+}
+
+.lead-text, .text-center-custom {
+    color: #d86d8f; /* Light pink for text */
+    font-size: 1.2rem;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Horizontal line styling */
+.hr-style {
+    border: 1px solid #d86d8f; /* Light pink horizontal line */
+}
+
+/* Form styles */
+.form-label {
+    color: #d86d8f; /* Light pink for form labels */
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+}
+
+.form-control {
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+.form-control:focus {
+    border-color: #d86d8f; /* Focus border color */
+    box-shadow: 0 0 5px rgba(216, 109, 143, 0.5);
+}
+
+/* Button styles */
+.btn-submit, .btn-custom, .btn-outline-primary {
+    background-color: #d86d8f; /* Light pink background for buttons */
+    color: white;
+    border: none;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover {
+    background-color: #b24a6e; /* Darker pink for hover effect */
+}
+
+/* Alert styles */
+.alert-success {
+    background-color: #f8c8d1; /* Light pink background */
+    border-color: #f1a7bc; /* Light pink border */
+    color: #d86d8f; /* Pink text */
+}
+
+.alert-dismissible .btn-close {
+    color: #d86d8f; /* Custom close button color */
+}
+
+/* Custom styling for footer */
+footer {
+    background-color: #f8c8d1; /* Light pink background */
+    color: #4a4a4a;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 1rem; /* Adjust font size to align with typical design aesthetics */
+    font-family: 'Roboto', sans-serif;
+}
+
+footer p {
+    margin-bottom: 0;
+    font-weight: bold;
 }

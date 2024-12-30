@@ -27,8 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 LOGIN_URL = '/login/'  # Redirect to login page if the user is not authenticated
 
 # Application definition
@@ -120,7 +118,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# URL to access static files
+STATIC_URL = '/static/'
+
+# Directory for static files (add the path to your `static` directory)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'inventory', 'static'),  # Make sure the path is correct
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
