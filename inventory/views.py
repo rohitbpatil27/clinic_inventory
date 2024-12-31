@@ -5,12 +5,6 @@ from django.contrib.auth.decorators import login_required
 from .models import Medication, Patient, DispensedMedication
 from django.contrib import messages
 from itertools import groupby
-from django.http import FileResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from io import BytesIO
-import json
-
 
 def user_login(request):
     if request.method == 'POST':
@@ -143,6 +137,7 @@ def dispense_medication_view(request):
     patients = Patient.objects.all()
     return render(request, "dispense_medication.html", {"medications": medications, "patients": patients})
 
+@login_required
 # View for displaying patients and adding a new patient
 def patient_details(request):
     search_query = request.GET.get('search', '')
@@ -169,6 +164,7 @@ def add_patient(request):
             messages.error(request, "Name and age are required.")
             return redirect('add_patient')
         
+@login_required
 # Editing an existing patient
 def edit_patient(request, id):
     patient = get_object_or_404(Patient, id=id)

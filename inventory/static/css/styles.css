@@ -5,10 +5,10 @@
 }
 
 .navbar-brand {
-    font-size: 1.8rem;
+    font-size: 1.8rem; /* Consistent font size */
     font-weight: bold;
     color: #b24a6e; /* Darker pink for brand */
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Playfair Display', serif;
 }
 
 .navbar-brand:hover {
@@ -16,7 +16,7 @@
 }
 
 .navbar-nav .nav-link {
-    font-size: 1.2rem;
+    font-size: 1.2rem; /* Consistent with content font */
     color: #d86d8f; /* Pink for links */
     font-family: 'Roboto', sans-serif;
 }
@@ -34,10 +34,25 @@
     margin-right: 20px;
 }
 
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.5rem; /* Adjusted for smaller screens */
+    }
+    .navbar-nav .nav-link {
+        font-size: 1rem; /* Smaller font size for better fit */
+    }
+    .navbar-nav .nav-item {
+        margin-right: 10px; /* Reduced margin for mobile */
+    }
+}
+
 /* Custom styling for page content */
 body {
-    background-color: #f9f9f9; /* Light background */
+    background-color: #fff; /* White background */
     font-family: 'Roboto', sans-serif;
+    font-size: 1rem; /* Consistent font size */
+    color: #4a4a4a;
 }
 
 .container {
@@ -56,15 +71,29 @@ body {
 .card-header {
     background-color: #f1f1f1;
     color: #333;
-    font-size: 1.25rem;
+    font-size: 1.5rem; /* Standard header font size */
     font-weight: bold;
     text-align: center;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Playfair Display', serif;
 }
 
-.card-title {
+.card-title, .display-4 {
     color: #d86d8f !important; /* Custom pink color */
+    font-size: 1.4rem; /* Adjusted for consistency */
 }
+
+/* Responsive adjustments for cards */
+@media (max-width: 768px) {
+    .card-header {
+        font-size: 1.2rem; /* Adjust header size for smaller screens */
+    }
+    .card-title, .display-4 {
+        font-size: 1.2rem; /* Reduced font size for better fit */
+    }
+}
+
+/* Remaining styles remain the same */
+
 
 /* Table custom styling */
 .table {
@@ -74,21 +103,22 @@ body {
 .table-heading {
     background-color: #f8c8d1; /* Light pink header */
     color: #333; /* Dark text for readability */
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Playfair Display', serif;
 }
 
 /* Heading and text styles */
-.available-stock-heading, .low-stock-heading, .add-medicine-heading, .dispense-medication-heading {
+.available-stock-heading, .low-stock-heading, .add-medicine-heading, 
+.dispense-medication-heading, .patient-details-heading {
     color: #d86d8f; /* Light pink for headings */
-    font-size: 2.5rem;
+    font-size: 2rem; /* Standard large heading size */
     font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Playfair Display', serif;
     margin-bottom: 20px;
 }
 
 .lead-text, .text-center-custom {
     color: #d86d8f; /* Light pink for text */
-    font-size: 1.2rem;
+    font-size: 1rem; /* Match body font size */
     font-family: 'Roboto', sans-serif;
 }
 
@@ -99,9 +129,10 @@ body {
 
 /* Form styles */
 .form-label {
-    color: #d86d8f; /* Light pink for form labels */
+    color: #d86d8f !important; /* Light pink for form labels */
     font-weight: bold;
     font-family: 'Roboto', sans-serif;
+    font-size: 1rem; /* Consistent with other text */
 }
 
 .form-control {
@@ -116,18 +147,22 @@ body {
 }
 
 /* Button styles */
-.btn-submit, .btn-custom, .btn-outline-primary {
+.btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
+.btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success  {
     background-color: #d86d8f; /* Light pink background for buttons */
     color: white;
     border: none;
     font-weight: bold;
-    padding: 12px 20px;
+    padding: 10px 15px;
     border-radius: 5px;
     font-family: 'Roboto', sans-serif;
+    font-size: 1rem; /* Consistent button text size */
 }
 
-.btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover {
+.btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-warning:hover, 
+.btn-danger:hover, .btn-primary:hover, .btn-close:hover, .close:hover, .btn-secondary:hover, .btn-success:hover {
     background-color: #b24a6e; /* Darker pink for hover effect */
+    color: white !important;
 }
 
 /* Alert styles */
@@ -135,10 +170,12 @@ body {
     background-color: #f8c8d1; /* Light pink background */
     border-color: #f1a7bc; /* Light pink border */
     color: #d86d8f; /* Pink text */
+    font-size: 1rem; /* Match body font size */
 }
 
 .alert-dismissible .btn-close {
     color: #d86d8f; /* Custom close button color */
+    font-size: 1rem; /* Consistent with other text */
 }
 
 /* Custom styling for footer */
@@ -147,11 +184,12 @@ footer {
     color: #4a4a4a;
     padding: 20px 0;
     text-align: center;
-    font-size: 1rem; /* Adjust font size to align with typical design aesthetics */
+    font-size: 1rem; /* Consistent footer text size */
     font-family: 'Roboto', sans-serif;
 }
 
 footer p {
     margin-bottom: 0;
     font-weight: bold;
+    font-size: 1rem; /* Consistent with footer font */
 }

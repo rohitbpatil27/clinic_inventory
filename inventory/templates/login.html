@@ -9,12 +9,13 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f4f7fc;
+            background-color: #f8c8d1; /* Light pink background */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            color: #4a4a4a;
         }
 
         .container {
@@ -29,8 +30,9 @@
         h2 {
             text-align: center;
             margin-bottom: 30px;
-            font-size: 28px;
-            color: #333;
+            font-size: 2rem;
+            color: #d86d8f; /* Light pink for heading */
+            font-family: 'Playfair Display', serif;
         }
 
         .message {
@@ -45,57 +47,63 @@
         }
 
         label {
-            font-size: 14px;
-            color: #555;
+            font-size: 1rem;
+            color: #d86d8f; /* Light pink for labels */
             display: block;
             margin-bottom: 8px;
+            font-weight: bold;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
             padding: 14px;
-            border: 1px solid #ccc;
+            border: 1px solid #d86d8f; /* Light pink border */
             border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         input[type="text"]:focus,
         input[type="password"]:focus {
-            border-color: #0066cc;
+            border-color: #b24a6e; /* Darker pink focus */
             outline: none;
+            box-shadow: 0 0 5px rgba(216, 109, 143, 0.5);
         }
 
         button[type="submit"] {
             width: 100%;
             padding: 14px;
-            background-color: #0066cc;
+            background-color: #d86d8f; /* Light pink button */
             color: white;
-            font-size: 16px;
+            font-size: 1rem;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            font-weight: bold;
+            font-family: 'Roboto', sans-serif;
             transition: background-color 0.3s ease;
         }
 
         button[type="submit"]:hover {
-            background-color: #005bb5;
+            background-color: #b24a6e; /* Darker pink for hover */
         }
 
         .footer {
             text-align: center;
             margin-top: 20px;
-            font-size: 14px;
-            color: #777;
+            font-size: 1rem;
+            color: #4a4a4a;
         }
 
         .footer a {
-            color: #0066cc;
+            color: #d86d8f; /* Light pink links */
             text-decoration: none;
+            font-weight: bold;
         }
 
         .footer a:hover {
+            color: #b24a6e; /* Darker pink on hover */
             text-decoration: underline;
         }
     </style>
@@ -133,12 +141,6 @@
             <input type="hidden" name="next" value="{{ request.GET.next }}">
             <button type="submit">Login</button>
         </form>
-
-        <div class="footer">
-            <p>Don't have an account? <a href="#">Sign up here</a></p>
-        </div>
     </div>
-
 </body>
-
 </html>
