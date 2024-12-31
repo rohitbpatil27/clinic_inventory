@@ -1,155 +1,169 @@
 /* Custom styling for navigation */
 .navbar {
-    background-color: #f8c8d1; /* Light pink background */
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.navbar-brand {
+    background-color: #F8BBD0; /* Soft Pink */
+    border-bottom: 1px solid #E0E0E0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle box-shadow */
+  }
+  
+  .navbar-brand {
     font-size: 1.8rem; /* Consistent font size */
     font-weight: bold;
-    color: #b24a6e; /* Darker pink for brand */
+    color: #D86D8F; /* Darker Pink */
     font-family: 'Playfair Display', serif;
-}
-
-.navbar-brand:hover {
-    color: #b24a6e; /* Darker pink on hover */
-}
-
-.navbar-nav .nav-link {
+    letter-spacing: 0.05em; /* Slight letter-spacing for better readability */
+  }
+  
+  .navbar-brand:hover {
+    color: #D86D8F; /* Darker Pink on hover */
+    text-decoration: none; /* Remove default underline */
+  }
+  
+  .navbar-nav .nav-link {
     font-size: 1.2rem; /* Consistent with content font */
-    color: #d86d8f; /* Pink for links */
+    color: #D86D8F; /* Pink for links */
     font-family: 'Roboto', sans-serif;
-}
-
-.navbar-nav .nav-link:hover {
-    color: #b24a6e; /* Darker pink on hover */
+    transition: color 0.3s ease; /* Smooth color transition on hover */
+  }
+  
+  .navbar-nav .nav-link:hover {
+    color: #B24A6E; /* Darker Pink on hover */
     font-weight: bold;
-}
-
-.navbar-toggler {
-    border-color: #ddd;
-}
-
-.navbar-nav .nav-item {
-    margin-right: 20px;
-}
-
-/* Responsive adjustments for mobile */
+  }
+  
+/* Fix for mobile burger menu */
 @media (max-width: 768px) {
+    .navbar-toggler {
+      padding: 15px; /* Increase padding for better touch target */
+    }
+  }
+  
+  .navbar-nav .nav-item {
+    margin-right: 20px;
+  }
+  
+  /* Responsive adjustments for mobile */
+  @media (max-width: 768px) {
     .navbar-brand {
-        font-size: 1.5rem; /* Adjusted for smaller screens */
+      font-size: 1.5rem; /* Adjusted for smaller screens */
     }
     .navbar-nav .nav-link {
-        font-size: 1rem; /* Smaller font size for better fit */
+      font-size: 1rem; /* Smaller font size for better fit */
     }
     .navbar-nav .nav-item {
-        margin-right: 10px; /* Reduced margin for mobile */
+      margin-right: 10px; /* Reduced margin for mobile */
     }
-}
-
-/* Custom styling for page content */
-body {
-    background-color: #fff; /* White background */
+  }
+  
+  /* Custom styling for page content */
+  body {
+    background-color: #F8F8F8; /* Light Gray for a clean background */
     font-family: 'Roboto', sans-serif;
     font-size: 1rem; /* Consistent font size */
     color: #4a4a4a;
-}
-
-.container {
+  }
+  
+  .container {
     padding-top: 30px;
-}
-
-.card {
-    border: 1px solid #e0e0e0;
+  }
+  
+  .card {
+    border: 1px solid #E0E0E0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card-body {
-    background-color: #f8f8f8; /* Light background for card body */
-}
-
-.card-header {
-    background-color: #f1f1f1;
+    border-radius: 5px; /* Add subtle border radius */
+    overflow: hidden; /* Create a cleaner look */
+  }
+  
+  .card-body {
+    background-color: #FDFDFD; /* Slightly off-white */
+  }
+  
+  .card-header {
+    background-color: #F1F1F1;
     color: #333;
     font-size: 1.5rem; /* Standard header font size */
     font-weight: bold;
     text-align: center;
     font-family: 'Playfair Display', serif;
-}
-
-.card-title, .display-4 {
-    color: #d86d8f !important; /* Custom pink color */
+    border-bottom: 1px solid #E0E0E0; /* Subtle border */
+  }
+  
+  .card-title, .display-4 {
+    color: #D86D8F !important; /* Custom pink color */
     font-size: 1.4rem; /* Adjusted for consistency */
-}
-
-/* Responsive adjustments for cards */
-@media (max-width: 768px) {
+  }
+  
+  /* Responsive adjustments for cards */
+  @media (max-width: 768px) {
     .card-header {
-        font-size: 1.2rem; /* Adjust header size for smaller screens */
+      font-size: 1.2rem; /* Adjust header size for smaller screens */
     }
     .card-title, .display-4 {
-        font-size: 1.2rem; /* Reduced font size for better fit */
+      font-size: 1.2rem; /* Reduced font size for better fit */
     }
-}
-
-/* Remaining styles remain the same */
-
-
-/* Table custom styling */
-.table {
+  }
+  
+  /* Remaining styles remain the same */
+  
+  /* Table custom styling */
+  .table {
     background-color: #fff; /* White background for table */
-}
-
-.table-heading {
-    background-color: #f8c8d1; /* Light pink header */
+    border-radius: 5px; /* Add border radius to tables */
+    overflow: hidden; /* Create a cleaner look */
+  }
+  
+  .table-heading {
+    background-color: #F8BBD0; /* Soft Pink */
     color: #333; /* Dark text for readability */
     font-family: 'Playfair Display', serif;
-}
-
-/* Heading and text styles */
-.available-stock-heading, .low-stock-heading, .add-medicine-heading, 
-.dispense-medication-heading, .patient-details-heading {
-    color: #d86d8f; /* Light pink for headings */
+  }
+  
+  /* Heading and text styles */
+  .available-stock-heading, .low-stock-heading, .add-medicine-heading, 
+  .dispense-medication-heading, .patient-details-heading {
+    color: #D86D8F; /* Light pink for headings */
     font-size: 2rem; /* Standard large heading size */
     font-weight: bold;
     font-family: 'Playfair Display', serif;
     margin-bottom: 20px;
-}
-
-.lead-text, .text-center-custom {
-    color: #d86d8f; /* Light pink for text */
+    text-align: center; /* Center headings for visual appeal */
+  }
+  
+  .lead-text, .text-center-custom {
+    color: #D86D8F; /* Light pink for text */
     font-size: 1rem; /* Match body font size */
     font-family: 'Roboto', sans-serif;
-}
-
-/* Horizontal line styling */
-.hr-style {
-    border: 1px solid #d86d8f; /* Light pink horizontal line */
-}
-
-/* Form styles */
-.form-label {
-    color: #d86d8f !important; /* Light pink for form labels */
+  }
+  
+  /* Horizontal line styling */
+  .hr-style {
+    border: 1px solid #D86D8F; /* Light pink horizontal line */
+    margin: 20px 0; /* Add some space around the line */
+  }
+  
+  /* Form styles */
+  .form-label {
+    color: #D86D8F !important; /* Light pink for form labels */
     font-weight: bold;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem; /* Consistent with other text */
-}
-
-.form-control {
+  }
+  
+  .form-control {
     border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 10px;
-}
-
-.form-control:focus {
-    border-color: #d86d8f; /* Focus border color */
+    border: 1px solid #E0E0E0; /* Add subtle border */
+  }
+  
+  .form-control:focus {
+    border-color: #D86D8F; /* Focus border color */
     box-shadow: 0 0 5px rgba(216, 109, 143, 0.5);
-}
-
-/* Button styles */
-.btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
-.btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success  {
-    background-color: #d86d8f; /* Light pink background for buttons */
+  }
+  
+  /* Button styles */
+  .btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
+  .btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success  {
+    background-color: #D86D8F; /* Light pink background for buttons */
     color: white;
     border: none;
     font-weight: bold;
@@ -157,39 +171,37 @@ body {
     border-radius: 5px;
     font-family: 'Roboto', sans-serif;
     font-size: 1rem; /* Consistent button text size */
-}
-
-.btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-warning:hover, 
-.btn-danger:hover, .btn-primary:hover, .btn-close:hover, .close:hover, .btn-secondary:hover, .btn-success:hover {
-    background-color: #b24a6e; /* Darker pink for hover effect */
+    transition: background-color 0.3s ease; /* Smooth color transition on hover */
+  }
+  
+  .btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-warning:hover, 
+  .btn-danger:hover, .btn-primary:hover, .btn-close:hover, .close:hover, .btn-secondary:hover, .btn-success:hover {
+    background-color: #B24A6E; /* Darker pink for hover effect */
     color: white !important;
-}
-
-/* Alert styles */
-.alert-success {
-    background-color: #f8c8d1; /* Light pink background */
-    border-color: #f1a7bc; /* Light pink border */
-    color: #d86d8f; /* Pink text */
+  }
+  
+  /* Alert styles */
+  .alert-success {
+    background-color: #F8BBD0; /* Soft Pink */
+    border-color: #F1A7BC; /* Light pink border */
+    color: #D86D8F; /* Pink text */
     font-size: 1rem; /* Match body font size */
-}
-
-.alert-dismissible .btn-close {
-    color: #d86d8f; /* Custom close button color */
+    border-radius: 5px; /* Add border radius */
+    padding: 15px; /* Increase padding for better visual appearance */
+  }
+  
+  .alert-dismissible .btn-close {
+    color: #D86D8F; /* Custom close button color */
     font-size: 1rem; /* Consistent with other text */
-}
-
-/* Custom styling for footer */
-footer {
-    background-color: #f8c8d1; /* Light pink background */
+  }
+  
+  /* Custom styling for footer */
+  footer {
+    background-color: #F8BBD0; /* Soft Pink */
     color: #4a4a4a;
     padding: 20px 0;
     text-align: center;
     font-size: 1rem; /* Consistent footer text size */
     font-family: 'Roboto', sans-serif;
-}
-
-footer p {
-    margin-bottom: 0;
-    font-weight: bold;
-    font-size: 1rem; /* Consistent with footer font */
-}
+    border-top: 1px solid
+  }
