@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Medication, Patient, DispensedMedication
+from .models import Medication, Patient, DispensedMedication, History
 from django.contrib import messages
 from itertools import groupby
+from django.db.models import Q
 
 def user_login(request):
     if request.method == 'POST':
@@ -62,7 +63,10 @@ def low_stock(request):
 def available_stock(request):
     query = request.GET.get("search", "")  # Get the search query
     if query:
-        medications = Medication.objects.filter(name__icontains=query, quantity__gt=0)
+        medications = Medication.objects.filter(
+            Q(name__icontains=query) | Q(company_name__icontains=query), 
+            quantity__gt=0
+        )
     else:
         medications = Medication.objects.filter(quantity__gt=0)
 
@@ -185,3 +189,7 @@ def delete_patient(request, id):
     messages.success(request, "Patient deleted successfully.")
     return redirect('patient_details')
 
+@login_required
+def history_view(request):
+    user_history = History.objects.filter(user=request.user).order_by("-timestamp")
+    return render(request, "history.html", {"history": user_history})

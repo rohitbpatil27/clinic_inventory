@@ -5,7 +5,7 @@
 {% block content %}
 <div class="text-center mt-4">
     <h1 class="display-4 text-primary">Welcome to Skinmitra Clinic Inventory</h1>
-    <p class="lead text-muted">Manage your inventory efficiently and stay updated with stock levels.</p>
+    <p class="lead text-muted">Streamline your clinic's inventory management and maintain optimal stock levels effortlessly.</p>
 </div>
 
 <div class="row mt-5 justify-content-center">
@@ -14,7 +14,7 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-primary"><i class="fas fa-boxes fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Available Stock</h5>
-                <p class="card-text text-muted">View the list of all medicines currently in stock.</p>
+                <p class="card-text text-muted">Browse all medicines currently in stock and monitor availability.</p>
                 <a href="/available_stock/" class="btn btn-primary btn-block">View Stock</a>
             </div>
         </div>
@@ -25,7 +25,7 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-primary"><i class="fas fa-exclamation-triangle fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Low Stock</h5>
-                <p class="card-text text-muted">Check medicines running low on stock to replenish them.</p>
+                <p class="card-text text-muted">Identify medicines with low quantities and prioritize restocking.</p>
                 <a href="/low_stock/" class="btn btn-primary btn-block">View Low Stock</a>
             </div>
         </div>
@@ -36,7 +36,7 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-primary"><i class="fas fa-plus-circle fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Add Medicine</h5>
-                <p class="card-text text-muted">Add medications to the inventory.</p>
+                <p class="card-text text-muted">Add new medicines to the inventory quickly and efficiently.</p>
                 <a href="/add_medicine/" class="btn btn-primary btn-block">Add Medicine</a>
             </div>
         </div>
@@ -47,8 +47,8 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-primary"><i class="fas fa-users fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Patient Details</h5>
-                <p class="card-text text-muted">Add, update, or view patient details in the inventory.</p>
-                <a href="/patient_details/" class="btn btn-primary btn-block">Patient Details</a>
+                <p class="card-text text-muted">Maintain an up-to-date record of patient information for streamlined care.</p>
+                <a href="/patient_details/" class="btn btn-primary btn-block">Manage Patients</a>
             </div>
         </div>
     </div>
@@ -58,10 +58,22 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-primary"><i class="fas fa-pills fa-2x mb-3"></i></h5>
                 <h5 class="card-title text-primary">Dispense Medication</h5>
-                <p class="card-text text-muted">Dispense medication to patients and manage inventory updates.</p>
+                <p class="card-text text-muted">Track medication dispensed to patients and ensure accurate inventory adjustments.</p>
                 <a href="/dispense_medication/" class="btn btn-primary btn-block">Dispense Medication</a>
             </div>
         </div>
     </div>
+
+    <div class="col-md-3 mb-4">
+        <div class="card tile-card" style="height: 200px;"> 
+            <div class="card-body text-center">
+                <h5 class="card-title text-primary"><i class="fas fa-history fa-2x mb-3"></i></h5>
+                <h5 class="card-title text-primary">History</h5>
+                <p class="card-text text-muted">Review all your past actions, including updates and transactions.</p>
+                <a href="/history/" class="btn btn-primary btn-block">View History</a>
+            </div>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

@@ -15,4 +15,7 @@ urlpatterns = [
     path('add_patient/', views.add_patient, name='add_patient'),
     path('edit_patient/<int:id>/', views.edit_patient, name='edit_patient'),
     path('delete_patient/<int:id>/', views.delete_patient, name='delete_patient'),
+    path('logout/', views.user_logout, name='logout'),
+    path("history/", views.history_view, name="history"),
+    
 ] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])

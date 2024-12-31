@@ -119,8 +119,8 @@
   
   /* Heading and text styles */
   .available-stock-heading, .low-stock-heading, .add-medicine-heading, 
-  .dispense-medication-heading, .patient-details-heading {
-    color: #D86D8F; /* Light pink for headings */
+  .dispense-medication-heading, .patient-details-heading, .history-heading {
+    color: #D86D8F !important; /* Light pink for headings */
     font-size: 2rem; /* Standard large heading size */
     font-weight: bold;
     font-family: 'Playfair Display', serif;

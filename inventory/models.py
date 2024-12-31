@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Medication(models.Model):
     name = models.CharField(max_length=100)
@@ -26,3 +27,11 @@ class DispensedMedication(models.Model):
 
     def __str__(self):
         return f"{self.medication.name} to {self.patient.name} ({self.quantity})"
+    
+class History(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    action = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username}: {self.action} on {self.timestamp}"
