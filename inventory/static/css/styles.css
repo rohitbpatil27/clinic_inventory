@@ -101,9 +101,7 @@
       font-size: 1.2rem; /* Reduced font size for better fit */
     }
   }
-  
-  /* Remaining styles remain the same */
-  
+    
   /* Table custom styling */
   .table {
     background-color: #fff; /* White background for table */
@@ -162,7 +160,7 @@
   
   /* Button styles */
   .btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
-  .btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success  {
+  .btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success {
     background-color: #D86D8F; /* Light pink background for buttons */
     color: white;
     border: none;
