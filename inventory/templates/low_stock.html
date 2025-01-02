@@ -22,6 +22,7 @@
                                 <tr>
                                     <th>Medication Name</th>
                                     <th>Quantity</th>
+                                    <th>MR Details</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -29,6 +30,7 @@
                                 <tr>
                                     <td>{{ medication.name }}</td>
                                     <td>{{ medication.quantity }}</td>
+                                    <td>{{ medication.mr_number }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -39,7 +41,7 @@
                         </table>
                     </div>
                     {% else %}
-                    <p class="text-center-custom mt-4">No medicines with low stock!</p>
+                    <p class="low-stock-heading text-center-custom mt-4">No medicines with low stock!</p>
                     {% endif %}
                 </div>
             </div>

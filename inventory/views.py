@@ -6,6 +6,10 @@ from .models import Medication, Patient, DispensedMedication, History
 from django.contrib import messages
 from itertools import groupby
 from django.db.models import Q
+from django.core.paginator import Paginator
+from django.contrib.messages import get_messages
+import csv
+from django.http import HttpResponse
 
 def user_login(request):
     if request.method == 'POST':
@@ -26,7 +30,6 @@ def user_login(request):
     next_url = request.GET.get('next', '')
     return render(request, 'login.html', {'next': next_url})
 
-
 def user_logout(request):
     logout(request)
     return redirect('login')  # Redirect to the login page after logout
@@ -37,22 +40,29 @@ def dashboard(request):
 
 @login_required
 def add_medicine(request):
+     # Consume messages and clear them
+    storage = get_messages(request)
+    messages_list = list(storage)  # Convert to a list if needed
+    storage.used = True  # Mark messages as consumed
+
     if request.method == "POST":
         name = request.POST.get("name")
         company_name = request.POST.get("company_name")  # Capture company name from form
         quantity = int(request.POST.get("quantity"))
+        mr_number = request.POST.get("mr_number")  # Capture company name from form
 
         # Save the medicine to the database
         Medication.objects.create(
             name=name,
             company_name=company_name,
             quantity=quantity,
+            mr_number=mr_number,
         )
         
         messages.success(request, "Medicine added successfully!")
         return redirect("add_medicine")  # Redirect to the same page to show success message
 
-    return render(request, "add_medicine.html")
+    return render(request, "add_medicine.html", {'messages': messages_list})
 
 @login_required
 def low_stock(request):
@@ -144,13 +154,21 @@ def dispense_medication_view(request):
 @login_required
 # View for displaying patients and adding a new patient
 def patient_details(request):
-    search_query = request.GET.get('search', '')
-    patients = Patient.objects.all()
-
+    search_query = request.GET.get('search')
     if search_query:
-        patients = patients.filter(name__icontains=search_query)
-
-    return render(request, 'patient_details.html', {'patients': patients})
+        patients = Patient.objects.filter(
+            Q(name__icontains=search_query) | 
+            Q(contact__icontains=search_query) | 
+            Q(diagnosis__icontains=search_query)
+        )
+    else:
+        patients = Patient.objects.all()
+    
+    paginator = Paginator(patients, 10)  # Show 10 patients per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'patient_details.html', {'page_obj': page_obj, 'search_query': search_query})
 
 # Adding a new patient
 def add_patient(request):
@@ -193,3 +211,12 @@ def delete_patient(request, id):
 def history_view(request):
     user_history = History.objects.filter(user=request.user).order_by("-timestamp")
     return render(request, "history.html", {"history": user_history})
+
+def export_patients_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="patients.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Age', 'Gender', 'Contact', 'Diagnosis'])
+    for patient in Patient.objects.all():
+        writer.writerow([patient.name, patient.age, patient.contact, patient.diagnosis])
+    return response

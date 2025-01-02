@@ -6,6 +6,7 @@ class Medication(models.Model):
     quantity = models.IntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
     company_name = models.CharField(max_length=255, default="Unknown")  # Add this field
+    mr_number = models.CharField(max_length=255, default="Unknown")  # Add this field
 
     def __str__(self):
         return self.name
@@ -15,7 +16,7 @@ class Patient(models.Model):
     age = models.IntegerField()
     contact = models.CharField(max_length=15, blank=True, null=True)
     diagnosis = models.TextField(blank=True, null=True)  # New field for diagnosis
-
+    
     def __str__(self):
         return self.name
 
