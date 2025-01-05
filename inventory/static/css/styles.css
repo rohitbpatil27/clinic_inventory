@@ -1,205 +1,219 @@
-/* Custom styling for navigation */
+/* Global Styles */
+body {
+  background-color: #F8F8F8; /* Light Gray for a clean background */
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  color: #4a4a4a;
+}
+
+/* Navbar Styles */
 .navbar {
-    background-color: #F8BBD0; /* Soft Pink */
-    border-bottom: 1px solid #E0E0E0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle box-shadow */
-  }
-  
-  .navbar-brand {
-    font-size: 1.8rem; /* Consistent font size */
-    font-weight: bold;
-    color: #D86D8F; /* Darker Pink */
-    font-family: 'Playfair Display', serif;
-    letter-spacing: 0.05em; /* Slight letter-spacing for better readability */
-  }
-  
-  .navbar-brand:hover {
-    color: #D86D8F; /* Darker Pink on hover */
-    text-decoration: none; /* Remove default underline */
-  }
-  
-  .navbar-nav .nav-link {
-    font-size: 1.2rem; /* Consistent with content font */
-    color: #D86D8F; /* Pink for links */
-    font-family: 'Roboto', sans-serif;
-    transition: color 0.3s ease; /* Smooth color transition on hover */
-  }
-  
-  .navbar-nav .nav-link:hover {
-    color: #B24A6E; /* Darker Pink on hover */
-    font-weight: bold;
-  }
-  
-/* Fix for mobile burger menu */
+  background-color: #F8BBD0; /* Soft Pink */
+  border-bottom: 1px solid #E0E0E0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #D86D8F; /* Light Pink */
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 0.05em;
+}
+
+.navbar-brand:hover {
+  color: #D86D8F; /* Maintain hover color */
+  text-decoration: none;
+}
+
+.navbar-nav .nav-link {
+  font-size: 1.2rem;
+  color: #D86D8F; /* Light Pink for links */
+  font-family: 'Roboto', sans-serif;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #B24A6E;
+  font-weight: bold;
+}
+
+/* Mobile Navbar Adjustments */
 @media (max-width: 768px) {
-    .navbar-toggler {
-      padding: 15px; /* Increase padding for better touch target */
-    }
+  .navbar-toggler {
+      padding: 15px;
   }
-  
+  .navbar-brand {
+      font-size: 1.5rem;
+  }
+  .navbar-nav .nav-link {
+      font-size: 1rem;
+  }
   .navbar-nav .nav-item {
-    margin-right: 20px;
+      margin-right: 10px;
   }
-  
-  /* Responsive adjustments for mobile */
-  @media (max-width: 768px) {
-    .navbar-brand {
-      font-size: 1.5rem; /* Adjusted for smaller screens */
-    }
-    .navbar-nav .nav-link {
-      font-size: 1rem; /* Smaller font size for better fit */
-    }
-    .navbar-nav .nav-item {
-      margin-right: 10px; /* Reduced margin for mobile */
-    }
-  }
-  
-  /* Custom styling for page content */
-  body {
-    background-color: #F8F8F8; /* Light Gray for a clean background */
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem; /* Consistent font size */
-    color: #4a4a4a;
-  }
-  
-  .container {
-    padding-top: 30px;
-  }
-  
-  .card {
-    border: 1px solid #E0E0E0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 5px; /* Add subtle border radius */
-    overflow: hidden; /* Create a cleaner look */
-  }
-  
-  .card-body {
-    background-color: #FDFDFD; /* Slightly off-white */
-  }
-  
+}
+
+/* Card Styles */
+.card {
+  border: 1px solid #E0E0E0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.card-body {
+  background-color: #FDFDFD;
+}
+
+.card-header {
+  background-color: #F1F1F1;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.card-title, .display-4 {
+  color: #D86D8F !important; /* Light Pink */
+  font-size: 1.4rem;
+}
+
+/* Card Responsiveness */
+@media (max-width: 768px) {
   .card-header {
-    background-color: #F1F1F1;
-    color: #333;
-    font-size: 1.5rem; /* Standard header font size */
-    font-weight: bold;
-    text-align: center;
-    font-family: 'Playfair Display', serif;
-    border-bottom: 1px solid #E0E0E0; /* Subtle border */
+      font-size: 1.2rem;
   }
-  
   .card-title, .display-4 {
-    color: #D86D8F !important; /* Custom pink color */
-    font-size: 1.4rem; /* Adjusted for consistency */
+      font-size: 1.2rem;
   }
-  
-  /* Responsive adjustments for cards */
-  @media (max-width: 768px) {
-    .card-header {
-      font-size: 1.2rem; /* Adjust header size for smaller screens */
-    }
-    .card-title, .display-4 {
-      font-size: 1.2rem; /* Reduced font size for better fit */
-    }
-  }
-    
-  /* Table custom styling */
-  .table {
-    background-color: #fff; /* White background for table */
-    border-radius: 5px; /* Add border radius to tables */
-    overflow: hidden; /* Create a cleaner look */
-  }
-  
-  .table-heading {
-    background-color: #F8BBD0; /* Soft Pink */
-    color: #333; /* Dark text for readability */
-    font-family: 'Playfair Display', serif;
-  }
-  
-  /* Heading and text styles */
-  .available-stock-heading, .low-stock-heading, .add-medicine-heading, 
-  .dispense-medication-heading, .patient-details-heading, .history-heading {
-    color: #D86D8F !important; /* Light pink for headings */
-    font-size: 2rem; /* Standard large heading size */
-    font-weight: bold;
-    font-family: 'Playfair Display', serif;
-    margin-bottom: 20px;
-    text-align: center; /* Center headings for visual appeal */
-  }
-  
-  .lead-text, .text-center-custom {
-    color: #D86D8F; /* Light pink for text */
-    font-size: 1rem; /* Match body font size */
-    font-family: 'Roboto', sans-serif;
-  }
-  
-  /* Horizontal line styling */
-  .hr-style {
-    border: 1px solid #D86D8F; /* Light pink horizontal line */
-    margin: 20px 0; /* Add some space around the line */
-  }
-  
-  /* Form styles */
-  .form-label {
-    color: #D86D8F !important; /* Light pink for form labels */
-    font-weight: bold;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem; /* Consistent with other text */
-  }
-  
-  .form-control {
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    border: 1px solid #E0E0E0; /* Add subtle border */
-  }
-  
-  .form-control:focus {
-    border-color: #D86D8F; /* Focus border color */
-    box-shadow: 0 0 5px rgba(216, 109, 143, 0.5);
-  }
-  
-  /* Button styles */
-  .btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
-  .btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success {
-    background-color: #D86D8F; /* Light pink background for buttons */
-    color: white;
-    border: none;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem; /* Consistent button text size */
-    transition: background-color 0.3s ease; /* Smooth color transition on hover */
-  }
-  
-  .btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-warning:hover, 
-  .btn-danger:hover, .btn-primary:hover, .btn-close:hover, .close:hover, .btn-secondary:hover, .btn-success:hover {
-    background-color: #B24A6E; /* Darker pink for hover effect */
-    color: white !important;
-  }
-  
-  /* Alert styles */
-  .alert-success {
-    background-color: #F8BBD0; /* Soft Pink */
-    border-color: #F1A7BC; /* Light pink border */
-    color: #D86D8F; /* Pink text */
-    font-size: 1rem; /* Match body font size */
-    border-radius: 5px; /* Add border radius */
-    padding: 15px; /* Increase padding for better visual appearance */
-  }
-  
-  .alert-dismissible .btn-close {
-    color: #D86D8F; /* Custom close button color */
-    font-size: 1rem; /* Consistent with other text */
-  }
-  
-  /* Custom styling for footer */
-  footer {
-    background-color: #F8BBD0; /* Soft Pink */
-    color: #4a4a4a;
-    padding: 20px 0;
-    text-align: center;
-    font-size: 1rem; /* Consistent footer text size */
-    font-family: 'Roboto', sans-serif;
-    border-top: 1px solid
-  }
+}
+
+/* Table Styles */
+.table {
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.table-heading {
+  background-color: #F8BBD0; /* Soft Pink */
+  color: #333;
+  font-family: 'Playfair Display', serif;
+}
+
+/* Headings and Text Styles */
+.available-stock-heading, .low-stock-heading, .add-medicine-heading, 
+.dispense-medication-heading, .patient-details-heading, .history-heading, .disp-hist-heading {
+  color: #D86D8F !important; /* Light Pink */
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.lead-text, .text-center-custom {
+  color: #D86D8F; /* Light Pink */
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Horizontal Line */
+.hr-style {
+  border: 1px solid #D86D8F; /* Light Pink */
+  margin: 20px 0;
+}
+
+/* Form Styles */
+.form-label {
+  color: #D86D8F !important; /* Light Pink */
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+}
+
+.form-control {
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border: 1px solid #E0E0E0;
+}
+
+.form-control:focus {
+  border-color: #D86D8F;
+  box-shadow: 0 0 5px rgba(216, 109, 143, 0.5);
+}
+
+/* Button Styles */
+.btn-submit, .btn-custom, .btn-outline-primary, .btn-primary, 
+.btn-outline-secondary, .btn-warning, .btn-danger, .btn-close, .close, .btn-secondary, .btn-success {
+  background-color: #D86D8F; /* Light Pink */
+  color: white;
+  border: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover, .btn-custom:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover, .btn-warning:hover, 
+.btn-danger:hover, .btn-primary:hover, .btn-close:hover, .close:hover, .btn-secondary:hover, .btn-success:hover {
+  background-color: #B24A6E;
+  color: white !important;
+}
+
+/* Alert Styles */
+.alert-success {
+  background-color: #F8BBD0; /* Soft Pink */
+  border-color: #F1A7BC;
+  color: #D86D8F; /* Light Pink */
+  font-size: 1rem;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.alert-dismissible .btn-close {
+  color: #D86D8F; /* Light Pink */
+  font-size: 1rem;
+}
+
+/* Footer Styles */
+footer {
+  background-color: #F8BBD0; /* Soft Pink */
+  color: #4a4a4a;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 1rem;
+  border-top: 1px solid #E0E0E0;
+}
+
+/* Patient Row Styles */
+.patient-row {
+  background-color: #ffe6f0;
+  font-weight: bold;
+  color: #cc3366;
+}
+
+.patient-row:hover {
+  background-color: #ffcce0;
+}
+
+/* Pagination Styles */
+.pagination .page-item.active .page-link {
+  background-color: #cc3366;
+  border-color: #cc3366;
+  color: white;
+}
+
+.pagination .page-link {
+  color: #cc3366;
+}
+
+.pagination .page-link:hover {
+  background-color: #ffe6f0;
+}

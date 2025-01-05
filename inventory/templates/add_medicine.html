@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Add Medicine{% endblock %}
+{% block title %}Add or Update Medicine{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -8,7 +8,7 @@
         <div class="col-md-6">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
-                    <h1 class="text-center add-medicine-heading">Add Medicine</h1>
+                    <h1 class="text-center add-medicine-heading">Add or Update Medicine</h1>
                     <hr class="hr-style mb-4">
 
                     <!-- Display success messages -->
@@ -25,7 +25,19 @@
 
                     <form method="POST" class="mt-4">
                         {% csrf_token %}
+                        
                         <div class="form-group">
+                            <label for="medicine" class="form-label">Choose Medicine to Update:</label>
+                            <select id="medicine" name="medicine" class="form-control">
+                                <option value="">-- Select Medicine --</option>
+                                <option value="new">Add New Medicine</option>
+                                {% for medicine in medicines %}
+                                    <option value="{{ medicine.id }}" data-name="{{ medicine.name }}" data-company="{{ medicine.company_name }}" data-mr="{{ medicine.mr_number }}" data-quantity="{{ medicine.quantity }}">{{ medicine.name }} ({{ medicine.company_name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-3">
                             <label for="name" class="form-label">Medicine Name:</label>
                             <input type="text" id="name" name="name" class="form-control" placeholder="Enter the medicine name" required>
                         </div>
@@ -42,7 +54,7 @@
                             <input type="text" id="mr_number" name="mr_number" class="form-control" placeholder="Enter the MR Name and Number" required>
                         </div>
                         <div class="form-group mt-4 text-center">
-                            <button type="submit" class="btn btn-submit btn-lg">Add Medicine</button>
+                            <button type="submit" class="btn btn-submit btn-lg">Add or Update Medicine</button>
                         </div>
                     </form>
                 </div>
@@ -50,4 +62,36 @@
         </div>
     </div>
 </div>
+
+<!-- Include jQuery and Select2 JavaScript libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<!-- Initialize select2 for search functionality and auto-populate fields -->
+<script>
+    $(document).ready(function() {
+        // Initialize select2 for search
+        $('#medicine').select2();
+
+        // When a medicine is selected
+        $('#medicine').change(function() {
+            var selectedMedicine = $(this).find('option:selected');
+            var medicineId = selectedMedicine.val();
+
+            // Check if 'Add New Medicine' is selected
+            if (medicineId === 'new') {
+                $('#name').val('');
+                $('#company_name').val('');
+                $('#mr_number').val('');
+                $('#quantity').val('');
+            } else {
+                // Auto-populate fields based on selected medicine
+                $('#name').val(selectedMedicine.data('name'));
+                $('#company_name').val(selectedMedicine.data('company'));
+                $('#mr_number').val(selectedMedicine.data('mr'));
+                $('#quantity').val(selectedMedicine.data('quantity'));
+            }
+        });
+    });
+</script>
 {% endblock %}

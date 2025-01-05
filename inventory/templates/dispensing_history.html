@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="disp-hist-heading">Dispensing History</h1>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <tbody>
+                {% for patient, records in history %}
+                    <!-- Parent Row -->
+                    <tr class="patient-row" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}" style="cursor: pointer;">
+                        <td><strong>{{ patient.name }}</strong></td>
+                        <td colspan="4">Click to expand/collapse</td>
+                    </tr>
+
+                    <!-- Child Rows -->
+                    <tr id="patient-{{ patient.id }}" class="collapse">
+                        <td colspan="5">
+                            <table class="table table-sm">
+                                <tr>
+                                    <th>Medication</th>
+                                    <th>Quantity</th>
+                                    <th>Price Per Unit</th>
+                                    <th>Total Cost</th>
+                                    <th>Dispensed Date</th>
+                                </tr>
+                                {% for record in records %}
+                                    <tr>
+                                        <td>{{ record.medication.name }}</td>
+                                        <td>{{ record.quantity }}</td>
+                                        <td>{{ record.price }}</td>
+                                        <td>{{ record.cost }}</td>
+                                        <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td> <!-- Date format for dd/mm/yyyy and AM/PM -->
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center">No dispensing history available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if history.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ history.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% for num in history.paginator.page_range %}
+                    <li class="page-item {% if history.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if history.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ history.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}

@@ -8,15 +8,16 @@
         <div class="col-md-8">
             <div class="text-center">
                 <h1 class="dispense-medication-heading">Dispense Medication</h1>
-                <p class="lead-text">Select a patient and medications to dispense the required dosages.</p>
+                <p class="lead-text">Select a patient and medications, procedures, and consultation to calculate the total cost.</p>
                 <hr class="hr-style">
             </div>
-            <!-- Dispense Medication Form -->
+
             <div class="card shadow-lg border-0 p-4">
                 <h3 class="dispense-medication-heading">Dispense Medications</h3>
                 <form id="dispense-form" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="dispense_medication">
+
                     <div class="form-group mt-3">
                         <label for="patient" class="form-label">Select Patient:</label>
                         <select name="patient_id" id="patient" class="form-control shadow-sm" required>
@@ -28,13 +29,50 @@
                     </div>
 
                     <div id="medication-fields">
-                        <!-- Dynamic Medication Fields will be appended here -->
                     </div>
 
                     <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
 
+                    <div class="form-group mt-4">
+                        <label for="procedure" class="form-label">Procedure:</label>
+                        <input 
+                            type="text" 
+                            name="procedure" 
+                            id="procedure" 
+                            class="form-control shadow-sm" 
+                            placeholder="Enter procedure name (optional)"
+                        />
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label for="procedure_cost" class="form-label">Procedure Cost (₹):</label>
+                        <input 
+                            type="number" 
+                            name="procedure_cost" 
+                            id="procedure_cost" 
+                            class="form-control shadow-sm" 
+                            min="0" 
+                            placeholder="Enter procedure cost (optional)"
+                        />
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label for="consultation_charge" class="form-label">Consultation Charge (₹):</label>
+                        <input 
+                            type="number" 
+                            name="consultation_charge" 
+                            id="consultation_charge" 
+                            class="form-control shadow-sm" 
+                            min="0" 
+                            placeholder="Enter consultation charge (optional)"
+                        />
+                    </div>
+
                     <button type="submit" class="btn btn-submit btn-block mt-4">Dispense Medications</button>
                 </form>
+                <div id="grand-total" class="text-center mt-4" style="font-size: 1.5rem; font-weight: bold;">
+                    Grand Total: ₹0.00
+                </div>
                 <div id="status-message" class="mt-3"></div>
             </div>
         </div>
@@ -42,55 +80,151 @@
 </div>
 
 <script>
-    // Add Medication Input dynamically
-    document.getElementById('add-medication').addEventListener('click', function() {
-        const medicationFieldHTML = `
-            <div class="form-group mt-3 medication-field">
-                <label for="medication" class="form-label">Select Medication:</label>
-                <select name="medications[]" class="form-control shadow-sm" required>
-                    <option value="" disabled selected>Choose a medication</option>
-                    {% for medication in medications %}
-                        <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
-                    {% endfor %}
-                </select>
+// Add Medication Input dynamically
+document.getElementById('add-medication').addEventListener('click', function () {
+    const medicationFieldHTML = `
+        <div class="form-group mt-3 medication-field">
+            <label for="medication" class="form-label">Select Medication:</label>
+            <select name="medications[]" class="form-control shadow-sm medication-select" required>
+                <option value="" disabled selected>Choose a medication</option>
+                {% for medication in medications %}
+                    <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
+                {% endfor %}
+            </select>
 
-                <label for="quantity" class="form-label">Quantity:</label>
-                <input type="number" name="quantities[]" class="form-control shadow-sm" min="1" required placeholder="Enter quantity" />
-            </div>
-        `;
-        document.getElementById('medication-fields').insertAdjacentHTML('beforeend', medicationFieldHTML);
+            <label for="quantity" class="form-label">Quantity:</label>
+            <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" required placeholder="Enter quantity" />
+
+            <label for="price" class="form-label">Price per Unit (₹):</label>
+            <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" required placeholder="Enter price per unit" />
+
+            <label for="total" class="form-label">Total (₹):</label>
+            <input type="text" class="form-control shadow-sm total-field" readonly value="₹0.00" />
+
+            <!-- Remove Button -->
+            <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
+        </div>
+    `;
+    document.getElementById('medication-fields').insertAdjacentHTML('beforeend', medicationFieldHTML);
+});
+
+// Event delegation for dynamically added elements
+document.getElementById('medication-fields').addEventListener('input', function (e) {
+    if (
+        e.target.classList.contains('quantity-input') || 
+        e.target.classList.contains('price-input')
+    ) {
+        updateFieldTotal(e.target.closest('.medication-field'));
+    }
+    updateGrandTotal();
+});
+
+// Remove Medication Input dynamically
+document.getElementById('medication-fields').addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-medication')) {
+        const fieldToRemove = e.target.closest('.medication-field');
+        fieldToRemove.remove();
+        updateGrandTotal();
+    }
+});
+
+// Update the total for a single medication field
+function updateFieldTotal(medicationField) {
+    const quantity = parseInt(medicationField.querySelector('.quantity-input').value || 0, 10);
+    const price = parseFloat(medicationField.querySelector('.price-input').value || 0);
+    const totalField = medicationField.querySelector('.total-field');
+
+    const total = quantity * price;
+    totalField.value = `₹${total.toFixed(2)}`;
+}
+
+// Add procedure cost to grand total
+function updateProcedureTotal() {
+    const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
+    updateGrandTotal(); 
+}
+
+// Add consultation charge to grand total
+function updateConsultationTotal() {
+    const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
+    updateGrandTotal();
+}
+
+// Update grand total for all medications, procedure, and consultation
+function updateGrandTotal() {
+    let grandTotal = 0;
+    document.querySelectorAll('.total-field').forEach(totalField => {
+        const total = parseFloat(totalField.value.replace('₹', '') || 0);
+        grandTotal += total;
     });
+    const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
+    const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
+    grandTotal += procedureCost + consultationCharge;
+    document.getElementById('grand-total').textContent = `Grand Total: ₹${grandTotal.toFixed(2)}`;
+}
 
-    // Dispense Medication via AJAX
-    document.getElementById('dispense-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        formData.append("action", "dispense_medication");
+// Event listeners
+document.getElementById('procedure_cost').addEventListener('input', updateProcedureTotal);
+document.getElementById('consultation_charge').addEventListener('input', updateConsultationTotal);
 
-        fetch("", {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
-            },
-            body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
-            const statusMessage = document.getElementById("status-message");
-            if (data.status === "success") {
-                statusMessage.textContent = data.message;
-                statusMessage.style.color = "green";
+// Form submission via AJAX
+document.getElementById('dispense-form').addEventListener('submit', function (e) {
+  e.preventDefault();
 
-                // Optionally reset the form or update stock dynamically
-                this.reset();
-            } else {
-                statusMessage.textContent = data.message;
-                statusMessage.style.color = "red";
-            }
-        })
-        .catch(error => {
-            console.error("Error dispensing medications:", error);
-        });
-    });
+  const patientField = document.getElementById('patient');
+  const medicationFields = document.querySelectorAll('.medication-field');
+  const statusMessage = document.getElementById('status-message');
+
+  // Reset previous status message
+  statusMessage.textContent = '';
+  statusMessage.style.color = '';
+
+  // Validate patient selection
+  if (!patientField.value) {
+    statusMessage.textContent = "Please select a patient.";
+    statusMessage.style.color = "red";
+    return;
+  }
+
+  // Validate that at least one medication is added
+  if (medicationFields.length === 0) {
+    statusMessage.textContent = "Please add at least one medication.";
+    statusMessage.style.color = "red";
+    return;
+  }
+
+  // Submit form via AJAX if validation passes
+  const formData = new FormData(this);
+
+  fetch("", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
+    },
+    body: formData,
+  })
+  .then(response => response.json()) // Parse the JSON response here
+  .then(data => {
+    if (data.status === "success") {
+      // Show success message
+      statusMessage.textContent = data.message;
+      statusMessage.style.color = "green";
+
+      // Reset the form
+      this.reset();
+      document.getElementById('medication-fields').innerHTML = '';
+      document.getElementById('grand-total').textContent = `Grand Total: ₹0.00`;
+    } else {
+      // Show error message
+      statusMessage.textContent = data.message;
+      statusMessage.style.color = "red";
+    }
+  })
+  .catch(error => {
+    console.error("Error dispensing medications:", error);
+    statusMessage.textContent = "An unexpected error occurred.";
+    statusMessage.style.color = "red";
+  });
+});
 </script>
 {% endblock %}
