@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Medication, Patient, DispensedMedication, DispensingHistory, Billing
+from .models import Medication, Patient, DispensedMedication, Billing
 from django.contrib import messages
 from itertools import groupby
 from django.db.models import Q
@@ -10,6 +10,9 @@ from django.core.paginator import Paginator
 from django.contrib.messages import get_messages
 from django.db import transaction  # For atomicity
 import json
+from decimal import Decimal
+from django.db.models import Prefetch
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -126,14 +129,14 @@ def dispense_medication_view(request):
                 quantities = request.POST.getlist("quantities[]")
                 prices = request.POST.getlist("prices[]")
                 procedure = request.POST.get("procedure", "")
-                procedure_cost = float(request.POST.get("procedure_cost", 0.0))
-                consultation_charge = float(request.POST.get("consultation_charge", 0.0))
+                procedure_cost = Decimal(request.POST.get("procedure_cost", 0.0))
+                consultation_charge = Decimal(request.POST.get("consultation_charge", 0.0))
 
                 if len(medications) != len(quantities) or len(medications) != len(prices):
                     return JsonResponse({"status": "error", "message": "Mismatch between medications, quantities, and prices."})
 
-                if not medications:
-                    return JsonResponse({"status": "error", "message": "Please add at least one medication."})
+                if not (medications or procedure or consultation_charge):
+                    return JsonResponse({"status": "error", "message": "Please add at least one medication or Procedure or Consultation."})
 
                 total_medication_cost = 0
                 medication_details = []
@@ -142,8 +145,8 @@ def dispense_medication_view(request):
                     for medication_id, quantity_str, price_str in zip(medications, quantities, prices):
                         try:
                             medication = get_object_or_404(Medication, id=medication_id)
-                            quantity = int(quantity_str)
-                            price_per_unit = float(price_str)
+                            quantity = Decimal(quantity_str)
+                            price_per_unit = Decimal(price_str)
 
                             if quantity <= 0 or price_per_unit < 0:
                                 return JsonResponse({"status": "error", "message": "Quantity and price must be positive numbers."})
@@ -157,9 +160,9 @@ def dispense_medication_view(request):
 
                                 medication_details.append({
                                     "name": medication.name,
-                                    "quantity": quantity,
-                                    "price": price_per_unit,
-                                    "cost": cost
+                                    "quantity": float(quantity),
+                                    "price": float(price_per_unit),
+                                    "cost": float(cost)
                                 })
 
                                 DispensedMedication.objects.create(
@@ -167,7 +170,8 @@ def dispense_medication_view(request):
                                     medication=medication,
                                     quantity=quantity,
                                     price=price_per_unit,
-                                    cost=cost
+                                    cost=cost,
+                                    procedure=procedure
                                 )
                             else:
                                 return JsonResponse({"status": "error", "message": f"Not enough stock for {medication.name}."})
@@ -178,16 +182,6 @@ def dispense_medication_view(request):
                             return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
 
                     total_cost = total_medication_cost + procedure_cost + consultation_charge
-
-                    # Create DispensingHistory record
-                    DispensingHistory.objects.create(
-                        patient=patient,
-                        medication_details=json.dumps(medication_details),  # Store medication details as JSON
-                        procedure=procedure,
-                        procedure_cost=procedure_cost,
-                        consultation_charge=consultation_charge,
-                        total_cost=total_cost,
-                    )
 
                     # Create Billing record
                     Billing.objects.create(

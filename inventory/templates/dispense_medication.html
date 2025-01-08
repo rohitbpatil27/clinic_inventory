@@ -34,37 +34,39 @@
                     <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
 
                     <div class="form-group mt-4">
-                        <label for="procedure" class="form-label">Procedure:</label>
+                        <label for="procedure" class="form-label">Procedure: (Optional)</label>
                         <input 
                             type="text" 
                             name="procedure" 
                             id="procedure" 
                             class="form-control shadow-sm" 
-                            placeholder="Enter procedure name (optional)"
+                            placeholder="Enter procedure name"
                         />
                     </div>
 
                     <div class="form-group mt-3">
-                        <label for="procedure_cost" class="form-label">Procedure Cost (₹):</label>
+                        <label for="procedure_cost" class="form-label">Procedure Cost (₹): (Optional)</label>
                         <input 
                             type="number" 
                             name="procedure_cost" 
                             id="procedure_cost" 
                             class="form-control shadow-sm" 
                             min="0" 
-                            placeholder="Enter procedure cost (optional)"
+                            value="0.0"
+                            step="0.01"
                         />
                     </div>
 
                     <div class="form-group mt-3">
-                        <label for="consultation_charge" class="form-label">Consultation Charge (₹):</label>
+                        <label for="consultation_charge" class="form-label">Consultation Charge (₹): (Optional)</label>
                         <input 
                             type="number" 
                             name="consultation_charge" 
                             id="consultation_charge" 
                             class="form-control shadow-sm" 
                             min="0" 
-                            placeholder="Enter consultation charge (optional)"
+                            value="0.0"
+                            step="0.01"
                         />
                     </div>
 
@@ -84,22 +86,22 @@
 document.getElementById('add-medication').addEventListener('click', function () {
     const medicationFieldHTML = `
         <div class="form-group mt-3 medication-field">
-            <label for="medication" class="form-label">Select Medication:</label>
+            <label for="medication" class="form-label">Select Medication:</label><br>
             <select name="medications[]" class="form-control shadow-sm medication-select" required>
                 <option value="" disabled selected>Choose a medication</option>
                 {% for medication in medications %}
                     <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
                 {% endfor %}
-            </select>
+            </select><br>
 
             <label for="quantity" class="form-label">Quantity:</label>
-            <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" required placeholder="Enter quantity" />
+            <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" step="0.01" required placeholder="Enter quantity" /><br>
 
             <label for="price" class="form-label">Price per Unit (₹):</label>
-            <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" required placeholder="Enter price per unit" />
+            <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit" /><br>
 
             <label for="total" class="form-label">Total (₹):</label>
-            <input type="text" class="form-control shadow-sm total-field" readonly value="₹0.00" />
+            <input type="text" class="form-control shadow-sm total-field" value="₹0.00" /><br>
 
             <!-- Remove Button -->
             <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
@@ -182,13 +184,6 @@ document.getElementById('dispense-form').addEventListener('submit', function (e)
   // Validate patient selection
   if (!patientField.value) {
     statusMessage.textContent = "Please select a patient.";
-    statusMessage.style.color = "red";
-    return;
-  }
-
-  // Validate that at least one medication is added
-  if (medicationFields.length === 0) {
-    statusMessage.textContent = "Please add at least one medication.";
     statusMessage.style.color = "red";
     return;
   }

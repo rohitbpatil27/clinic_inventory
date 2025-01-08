@@ -22,6 +22,7 @@
                                     <th>Quantity</th>
                                     <th>Price Per Unit</th>
                                     <th>Total Cost</th>
+                                    <th>Procedure</th>
                                     <th>Dispensed Date</th>
                                 </tr>
                                 {% for record in records %}
@@ -30,6 +31,7 @@
                                         <td>{{ record.quantity }}</td>
                                         <td>{{ record.price }}</td>
                                         <td>{{ record.cost }}</td>
+                                        <th>{{ record.procedure }}</th>
                                         <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td> <!-- Date format for dd/mm/yyyy and AM/PM -->
                                     </tr>
                                 {% endfor %}
