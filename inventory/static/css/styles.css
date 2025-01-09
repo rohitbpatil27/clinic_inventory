@@ -17,7 +17,7 @@ body {
   font-size: 1.8rem;
   font-weight: bold;
   color: #D86D8F; /* Light Pink */
-  font-family: 'Playfair Display', serif;
+  font-family: 'Roboto', sans-serif;
   letter-spacing: 0.05em;
 }
 
@@ -216,4 +216,13 @@ footer {
 
 .pagination .page-link:hover {
   background-color: #ffe6f0;
+}
+
+.card-header-patient {
+  background-color: white;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  border: #F8BBD0;
+  border-style:solid;
+  border-width: 1px
 }

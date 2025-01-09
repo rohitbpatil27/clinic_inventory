@@ -3,51 +3,65 @@
 {% block content %}
 <div class="container">
     <h1 class="disp-hist-heading">Dispensing History</h1>
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <tbody>
-                {% for patient, records in history %}
-                    <!-- Parent Row -->
-                    <tr class="patient-row" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}" style="cursor: pointer;">
-                        <td><strong>{{ patient.name }}</strong></td>
-                        <td colspan="4">Click to expand/collapse</td>
-                    </tr>
 
-                    <!-- Child Rows -->
-                    <tr id="patient-{{ patient.id }}" class="collapse">
-                        <td colspan="5">
-                            <table class="table table-sm">
+    {% for patient, records in history %}
+    <div class="card my-3">
+        <div class="card-header-patient" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}">
+            <h5 class="card-header-patient mb-0">{{ patient.name }}</h5>
+        </div>
+        <div id="patient-{{ patient.id }}" class="collapse">
+            <div class="card-body">
+                {% if records %}
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Medication</th>
+                            <th>Quantity</th>
+                            <th>Medication Cost</th>
+                            <th>Procedure</th>
+                            <th>Procedure Cost</th>
+                            <th>Dispensed Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                            {% if record.medication_details %}
+                                {% for medication in record.medication_details %}
                                 <tr>
-                                    <th>Medication</th>
-                                    <th>Quantity</th>
-                                    <th>Price Per Unit</th>
-                                    <th>Total Cost</th>
-                                    <th>Procedure</th>
-                                    <th>Dispensed Date</th>
+                                    <td>{{ medication.name }}</td>
+                                    <td>{{ medication.quantity|default:"0.0" }}</td>
+                                    <td>{{ medication.cost|default:"0.0" }}</td>
+                                    {% if forloop.first %}
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                                    {% endif %}
                                 </tr>
-                                {% for record in records %}
-                                    <tr>
-                                        <td>{{ record.medication.name }}</td>
-                                        <td>{{ record.quantity }}</td>
-                                        <td>{{ record.price }}</td>
-                                        <td>{{ record.cost }}</td>
-                                        <th>{{ record.procedure }}</th>
-                                        <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td> <!-- Date format for dd/mm/yyyy and AM/PM -->
-                                    </tr>
                                 {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center">No dispensing history available.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                            {% else %}
+                                <tr>
+                                    <td>No medications</td>
+                                    <td>0.0</td>
+                                    <td>0.0</td>
+                                    <td>{{ record.procedure|default:"No procedure" }}</td>
+                                    <td>{{ record.procedure_cost|default:"0.00" }}</td>
+                                    <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center text-muted">No dispensing history available for this patient.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
+    {% empty %}
+    <p class="text-center text-muted">No dispensing history available.</p>
+    {% endfor %}
 
-    <div class="pagination">
+    <div class="pagination mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
                 {% if history.has_previous %}
