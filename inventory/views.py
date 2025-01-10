@@ -275,11 +275,22 @@ def dispense_medication_view(request):
 
 @login_required
 def dispensing_history_view(request):
+    # Fetch the search query from the request
+    search_query = request.GET.get('search', '').strip()
+
     # Fetch all history records from DispensedMedicationHistory
     all_history = (
         DispensedMedicationHistory.objects.select_related('patient')
         .order_by('-date_dispensed')
     )
+
+    # Filter history based on the search query
+    if search_query:
+        all_history = all_history.filter(
+            Q(patient__name__icontains=search_query) |
+            Q(patient__contact__icontains=search_query)  # Assuming a 'contact' field exists
+        )
+
     grouped_history = {}
 
     # Group records by patient
@@ -303,5 +314,10 @@ def dispensing_history_view(request):
     page_obj = paginator.get_page(page_number)
 
     return render(
-        request, 'dispensing_history.html', {'history': page_obj}
+        request, 
+        'dispensing_history.html', 
+        {
+            'history': page_obj,
+            'search_query': search_query,  # Pass the search query to the template
+        }
     )

@@ -4,6 +4,20 @@
 <div class="container">
     <h1 class="disp-hist-heading">Dispensing History</h1>
 
+    <!-- Search Form -->
+    <form method="get" action="" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search for a patient" value="{{ request.GET.search|default:'' }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
+
+    <!-- Search Results -->
+    {% if search_query %}
+    <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
+    {% endif %}
+
+    <!-- Dispensing History -->
     {% for patient, records in history %}
     <div class="card my-3">
         <div class="card-header-patient" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}">
@@ -66,19 +80,19 @@
             <ul class="pagination justify-content-center">
                 {% if history.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ history.previous_page_number }}" aria-label="Previous">
+                        <a class="page-link" href="?page={{ history.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% endif %}
                 {% for num in history.paginator.page_range %}
                     <li class="page-item {% if history.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if history.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ history.next_page_number }}" aria-label="Next">
+                        <a class="page-link" href="?page={{ history.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>
