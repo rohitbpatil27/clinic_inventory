@@ -4,13 +4,35 @@
 <div class="container">
     <h1 class="disp-hist-heading">Dispensing History</h1>
 
-    <!-- Search Form -->
+    <!-- Date Range Filter Form -->
     <form method="get" action="" class="mb-4">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search for a patient" value="{{ request.GET.search|default:'' }}">
-            <button type="submit" class="btn btn-primary">Search</button>
+            <input type="date" name="from_date" class="form-control" placeholder="From Date" value="{{ request.GET.from_date|default:'' }}">
+            <input type="date" name="to_date" class="form-control" placeholder="To Date" value="{{ request.GET.to_date|default:'' }}">
+            <button type="submit" class="btn btn-primary">Filter</button>
         </div>
     </form>
+
+    <!-- Showing the Date Range -->
+    {% if from_date and to_date %}
+    <p class="text-muted">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
+    {% endif %}
+
+    <!-- Dispensing History Summary -->
+    {% if history %}
+    <div class="card my-3">
+        <div class="card-header">
+            <h5 class="card-title">Summary of Costs</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Total Medication Cost: </strong>{{ total_medication_cost|default:"0.00" }}</p>
+            <p><strong>Total Procedure Cost: </strong>{{ total_procedure_cost|default:"0.00" }}</p>
+            <p><strong>Total Consultation Cost: </strong>{{ total_consultation_cost|default:"0.00" }}</p>
+            <p><strong>Total Cost: </strong>{{ total_cost|default:"0.00" }}</p>
+        </div>
+    </div>
+    {% endif %}
+
 
     <!-- Search Results -->
     {% if search_query %}
@@ -34,6 +56,8 @@
                             <th>Medication Cost</th>
                             <th>Procedure</th>
                             <th>Procedure Cost</th>
+                            <th>Consultation Cost</th>
+                            <th>Total Cost</th>
                             <th>Dispensed Date</th>
                         </tr>
                     </thead>
@@ -46,8 +70,11 @@
                                     <td>{{ medication.quantity|default:"0.0" }}</td>
                                     <td>{{ medication.cost|default:"0.0" }}</td>
                                     {% if forloop.first %}
+                                        <!-- Only fill procedure, consultation, and total cost once per record -->
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.cost|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
                                     {% endif %}
                                 </tr>
@@ -59,6 +86,8 @@
                                     <td>0.0</td>
                                     <td>{{ record.procedure|default:"No procedure" }}</td>
                                     <td>{{ record.procedure_cost|default:"0.00" }}</td>
+                                    <td>{{ record.consultation_charge|default:"0.00" }}</td>
+                                    <td>{{ record.cost|default:"0.00" }}</td>
                                     <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
                                 </tr>
                             {% endif %}
@@ -74,7 +103,7 @@
     {% empty %}
     <p class="text-center text-muted">No dispensing history available.</p>
     {% endfor %}
-
+    
     <div class="pagination mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
