@@ -4,18 +4,35 @@
 <div class="container">
     <h1 class="disp-hist-heading">Dispensing History</h1>
 
-    <!-- Date Range Filter Form -->
+    <!-- Filter and Search Form -->
     <form method="get" action="" class="mb-4">
-        <div class="input-group">
-            <input type="date" name="from_date" class="form-control" placeholder="From Date" value="{{ request.GET.from_date|default:'' }}">
-            <input type="date" name="to_date" class="form-control" placeholder="To Date" value="{{ request.GET.to_date|default:'' }}">
-            <button type="submit" class="btn btn-primary">Filter</button>
+        <div class="row g-3">
+            <div class="col-md-3">
+                <input type="date" name="from_date" class="form-control" placeholder="From Date" 
+                       value="{{ request.GET.from_date|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="to_date" class="form-control" placeholder="To Date" 
+                       value="{{ request.GET.to_date|default:'' }}">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="search_query" class="form-control" placeholder="Search Patient" 
+                       value="{{ request.GET.search_query|default:'' }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
+            </div>
         </div>
     </form>
 
     <!-- Showing the Date Range -->
     {% if from_date and to_date %}
     <p class="text-muted">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
+    {% endif %}
+
+    <!-- Showing Search Query -->
+    {% if search_query %}
+    <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
     {% endif %}
 
     <!-- Dispensing History Summary -->
@@ -31,12 +48,6 @@
             <p><strong>Total Cost: </strong>{{ total_cost|default:"0.00" }}</p>
         </div>
     </div>
-    {% endif %}
-
-
-    <!-- Search Results -->
-    {% if search_query %}
-    <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
     {% endif %}
 
     <!-- Dispensing History -->
@@ -70,7 +81,6 @@
                                     <td>{{ medication.quantity|default:"0.0" }}</td>
                                     <td>{{ medication.cost|default:"0.0" }}</td>
                                     {% if forloop.first %}
-                                        <!-- Only fill procedure, consultation, and total cost once per record -->
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00" }}</td>
@@ -109,19 +119,19 @@
             <ul class="pagination justify-content-center">
                 {% if history.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ history.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Previous">
+                        <a class="page-link" href="?page={{ history.previous_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Previous">
                             <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% endif %}
                 {% for num in history.paginator.page_range %}
                     <li class="page-item {% if history.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                        <a class="page-link" href="?page={{ num }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}">{{ num }}</a>
                     </li>
                 {% endfor %}
                 {% if history.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ history.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" aria-label="Next">
+                        <a class="page-link" href="?page={{ history.next_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Next">
                             <span aria-hidden="true">&raquo;</span>
                         </a>
                     </li>

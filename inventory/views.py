@@ -272,29 +272,33 @@ def dispense_medication_view(request):
 
 @login_required
 def dispensing_history_view(request):
-    # Fetch the search query from the request
+    # Fetch the search query, from_date, and to_date from the request
     search_query = request.GET.get('search', '').strip()
-
-    # Fetch the from_date and to_date from the request
     from_date = request.GET.get('from_date')
     to_date = request.GET.get('to_date')
 
-    # Start with all history records from DispensedMedicationHistory
+    # Fetch all records, prefetched with related patient data
     all_history = (
         DispensedMedicationHistory.objects.select_related('patient')
         .order_by('-date_dispensed')
     )
 
-    # Apply the search query filter
+    # Apply search query filter
     if search_query:
         all_history = all_history.filter(
             Q(patient__name__icontains=search_query) |
-            Q(patient__contact__icontains=search_query)  # Assuming 'contact' exists
+            Q(patient__contact__icontains=search_query)  # Assuming 'contact' field exists
         )
 
-    # Apply date range filter if both from_date and to_date are provided
+    # Apply date range filter
     if from_date and to_date:
-        all_history = all_history.filter(date_dispensed__range=[from_date, to_date])
+        try:
+            all_history = all_history.filter(
+                date_dispensed__date__range=[from_date, to_date]
+            )
+        except ValueError:
+            # Log if there's a problem with date parsing
+            logger.error(f"Invalid date range: {from_date} to {to_date}")
 
     # Initialize total sums
     total_medication_cost = 0
@@ -302,22 +306,19 @@ def dispensing_history_view(request):
     total_consultation_cost = 0
     total_cost = 0
 
-    # Group records by patient and calculate sums
+    # Group records by patient and calculate totals
     grouped_history = {}
     for record in all_history:
-        logger.debug(f"Medication Details for Record {record.id}: {record.medication_details}")
-        
-        # Ensure medication_details is a list of dictionaries
-        if isinstance(record.medication_details, list):
-            # Sum up medication costs from the medication_details
-            medication_cost = sum(medication['cost'] for medication in record.medication_details)
-        else:
-            medication_cost = 0
+        medication_cost = 0
 
-        # Update the total medication cost
+        # Ensure medication_details is a list and calculate medication cost
+        if isinstance(record.medication_details, list):
+            medication_cost = sum(
+                medication.get('cost', 0) for medication in record.medication_details
+            )
+
+        # Update totals
         total_medication_cost += medication_cost
-        
-        # Add procedure cost and consultation charge to the totals
         total_procedure_cost += record.procedure_cost or 0
         total_consultation_cost += record.consultation_charge or 0
         total_cost += record.cost or 0
@@ -331,7 +332,7 @@ def dispensing_history_view(request):
     grouped_history_list = list(grouped_history.items())
 
     # Paginate the grouped history
-    paginator = Paginator(grouped_history_list, 10)  # Show 10 patients per page
+    paginator = Paginator(grouped_history_list, 10)  # 10 patients per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -341,7 +342,7 @@ def dispensing_history_view(request):
         'dispensing_history.html',
         {
             'history': page_obj,
-            'search_query': search_query,  # Pass the search query to the template
+            'search_query': search_query,
             'total_medication_cost': total_medication_cost,
             'total_procedure_cost': total_procedure_cost,
             'total_consultation_cost': total_consultation_cost,
@@ -350,5 +351,4 @@ def dispensing_history_view(request):
             'to_date': to_date,
         }
     )
-
 
