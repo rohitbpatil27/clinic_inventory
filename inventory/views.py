@@ -42,18 +42,29 @@ def dashboard(request):
 @login_required
 def add_medicine(request):
     if request.method == "POST":
-        medicine_id = request.POST.get("medicine")  # Capture the selected medicine ID
+        action = request.POST.get("action")  # Determines if it's add/update or delete
+        medicine_id = request.POST.get("medicine")  # Selected medicine ID
         name = request.POST.get("name")  # Medicine name
         company_name = request.POST.get("company_name")  # Company name
-        quantity = request.POST.get("quantity")  # Quantity as string
+        quantity = request.POST.get("quantity")  # Quantity
         mr_number = request.POST.get("mr_number")  # MR number
 
-        # Validate medicine_id
-        if not medicine_id:
-            messages.error(request, "No medicine selected. Please select a medicine or choose 'Add New Medicine'.")
+        # Handle Delete Operation
+        if action == "delete":
+            if medicine_id and medicine_id != "new":
+                try:
+                    medication = Medication.objects.get(id=int(medicine_id))
+                    medication.delete()
+                    messages.success(request, f"Medicine '{medication.name}' deleted successfully!")
+                except Medication.DoesNotExist:
+                    messages.error(request, "Selected medicine does not exist.")
+                except Exception as e:
+                    messages.error(request, f"Error deleting medicine: {str(e)}")
+            else:
+                messages.error(request, "Please select a valid medicine to delete.")
             return redirect("add_medicine")
 
-        # Validate quantity
+        # Validate quantity for add/update operations
         try:
             quantity = int(quantity)
             if quantity <= 0:
@@ -63,7 +74,7 @@ def add_medicine(request):
             return redirect("add_medicine")
 
         # Handle "new" medicine creation
-        if medicine_id == 'new':
+        if medicine_id == "new":
             try:
                 Medication.objects.create(
                     name=name,
@@ -79,8 +90,7 @@ def add_medicine(request):
         # Handle updating existing medicine
         else:
             try:
-                medicine_id = int(medicine_id)  # Convert to integer
-                medication = Medication.objects.get(id=medicine_id)
+                medication = Medication.objects.get(id=int(medicine_id))
                 medication.quantity += quantity  # Update quantity
                 medication.name = name  # Optionally update name
                 medication.company_name = company_name  # Optionally update company name
@@ -88,8 +98,6 @@ def add_medicine(request):
                 medication.save()
 
                 messages.success(request, f"Stock for {medication.name} updated successfully!")
-            except ValueError:
-                messages.error(request, "Invalid medicine ID.")
             except Medication.DoesNotExist:
                 messages.error(request, "Selected medicine does not exist.")
             except Exception as e:
@@ -97,8 +105,8 @@ def add_medicine(request):
 
         return redirect("add_medicine")
 
-    # Render the form for adding/updating medicine if GET request
-    medicines = Medication.objects.all()  # Fetch all medicines for dropdown
+    # Render the form for adding, updating, or deleting medicine if GET request
+    medicines = Medication.objects.all()
     return render(request, "add_medicine.html", {"medicines": medicines})
 
 @login_required
