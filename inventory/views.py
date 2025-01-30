@@ -7,7 +7,6 @@ from django.contrib import messages
 from itertools import groupby
 from django.db.models import Q, Sum
 from django.core.paginator import Paginator
-from django.contrib.messages import get_messages
 from django.db import transaction  # For atomicity
 from decimal import Decimal
 import logging
@@ -42,45 +41,65 @@ def dashboard(request):
 
 @login_required
 def add_medicine(request):
-    # Consume messages and clear them
-    storage = get_messages(request)
-    messages_list = list(storage)  # Convert to a list if needed
-    storage.used = True  # Mark messages as consumed
-
     if request.method == "POST":
-        medicine_id = request.POST.get("medicine")  # Capture the selected medicine id (if updating)
-        name = request.POST.get("name")
-        company_name = request.POST.get("company_name")
-        quantity = int(request.POST.get("quantity"))
-        mr_number = request.POST.get("mr_number")
+        medicine_id = request.POST.get("medicine")  # Capture the selected medicine ID
+        name = request.POST.get("name")  # Medicine name
+        company_name = request.POST.get("company_name")  # Company name
+        quantity = request.POST.get("quantity")  # Quantity as string
+        mr_number = request.POST.get("mr_number")  # MR number
 
-        if medicine_id == 'new':
-            # Add new medicine
-            Medication.objects.create(
-                name=name,
-                company_name=company_name,
-                quantity=quantity,
-                mr_number=mr_number,
-            )
-
-            messages.success(request, "New medicine added successfully!")
+        # Validate medicine_id
+        if not medicine_id:
+            messages.error(request, "No medicine selected. Please select a medicine or choose 'Add New Medicine'.")
             return redirect("add_medicine")
-        else:
-            # Update existing medicine
+
+        # Validate quantity
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                raise ValueError("Quantity must be greater than zero.")
+        except ValueError:
+            messages.error(request, "Invalid quantity. Please enter a valid number greater than zero.")
+            return redirect("add_medicine")
+
+        # Handle "new" medicine creation
+        if medicine_id == 'new':
             try:
+                Medication.objects.create(
+                    name=name,
+                    company_name=company_name,
+                    quantity=quantity,
+                    mr_number=mr_number,
+                )
+                messages.success(request, "New medicine added successfully!")
+            except Exception as e:
+                messages.error(request, f"Failed to add new medicine: {str(e)}")
+            return redirect("add_medicine")
+
+        # Handle updating existing medicine
+        else:
+            try:
+                medicine_id = int(medicine_id)  # Convert to integer
                 medication = Medication.objects.get(id=medicine_id)
-                medication.quantity += quantity  # Increase the quantity of the selected medicine
+                medication.quantity += quantity  # Update quantity
+                medication.name = name  # Optionally update name
+                medication.company_name = company_name  # Optionally update company name
+                medication.mr_number = mr_number  # Optionally update MR number
                 medication.save()
 
                 messages.success(request, f"Stock for {medication.name} updated successfully!")
-                return redirect("add_medicine")
+            except ValueError:
+                messages.error(request, "Invalid medicine ID.")
             except Medication.DoesNotExist:
-                messages.error(request, "Medication not found.")
-                return redirect("add_medicine")
+                messages.error(request, "Selected medicine does not exist.")
+            except Exception as e:
+                messages.error(request, f"Failed to update medicine: {str(e)}")
 
-    # For GET request, pass all medicines to the template for updating purposes
-    medicines = Medication.objects.all()
-    return render(request, "add_medicine.html", {'messages': messages_list, 'medicines': medicines})
+        return redirect("add_medicine")
+
+    # Render the form for adding/updating medicine if GET request
+    medicines = Medication.objects.all()  # Fetch all medicines for dropdown
+    return render(request, "add_medicine.html", {"medicines": medicines})
 
 @login_required
 def low_stock(request):
