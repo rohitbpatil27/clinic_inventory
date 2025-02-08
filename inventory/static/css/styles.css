@@ -226,3 +226,33 @@ footer {
   border-style:solid;
   border-width: 1px
 }
+/* Adjusting the borders of Select2 to match Bootstrap's style */
+.select2-container--default .select2-selection--single {
+  border: 1px solid #ced4da !important; /* Light grey border matching Bootstrap */
+  border-radius: 0.375rem; /* Match Bootstrap's input border radius */
+  padding: 0.375rem 0.75rem; /* Match Bootstrap's input padding */
+  height: auto !important;
+  min-height: 38px; /* Ensures it aligns with other form inputs */
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure the search input inside the dropdown has proper styling */
+.select2-container .select2-search__field {
+  border: 1px solid #ced4da !important;
+  border-radius: 0.375rem;
+  padding: 0.375rem 0.75rem;
+}
+
+/* Style the dropdown */
+.select2-container .select2-dropdown {
+  border-radius: 0.375rem;
+  border: 1px solid #ced4da !important;
+}
+
+/* Fix hover and focus states */
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default .select2-selection--single:hover {
+  border-color: #80bdff !important; /* Matches Bootstrap's focus color */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}

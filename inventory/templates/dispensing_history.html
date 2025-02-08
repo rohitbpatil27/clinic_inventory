@@ -8,16 +8,13 @@
     <form method="get" action="" class="mb-4">
         <div class="row g-3">
             <div class="col-md-3">
-                <input type="date" name="from_date" class="form-control" placeholder="From Date" 
-                       value="{{ request.GET.from_date|default:'' }}">
+                <input type="date" name="from_date" class="form-control" placeholder="From Date" value="{{ request.GET.from_date|default:'' }}">
             </div>
             <div class="col-md-3">
-                <input type="date" name="to_date" class="form-control" placeholder="To Date" 
-                       value="{{ request.GET.to_date|default:'' }}">
+                <input type="date" name="to_date" class="form-control" placeholder="To Date" value="{{ request.GET.to_date|default:'' }}">
             </div>
             <div class="col-md-4">
-                <input type="text" name="search_query" class="form-control" placeholder="Search Patient" 
-                       value="{{ request.GET.search_query|default:'' }}">
+                <input type="text" name="search" class="form-control" placeholder="Search Patient" value="{{ request.GET.search|default:'' }}">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
@@ -25,14 +22,12 @@
         </div>
     </form>
 
-    <!-- Showing the Date Range -->
+    <!-- Display Date Range and Search Query -->
     {% if from_date and to_date %}
-    <p class="text-muted">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
+        <p class="text-muted">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
     {% endif %}
-
-    <!-- Showing Search Query -->
     {% if search_query %}
-    <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
+        <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
     {% endif %}
 
     <!-- Dispensing History Summary -->
@@ -46,11 +41,13 @@
             <p><strong>Total Procedure Cost: </strong>{{ total_procedure_cost|default:"0.00" }}</p>
             <p><strong>Total Consultation Cost: </strong>{{ total_consultation_cost|default:"0.00" }}</p>
             <p><strong>Total Cost: </strong>{{ total_cost|default:"0.00" }}</p>
+            <p><strong>Total Collected via Cash: </strong>{{ total_cash|default:"0.00" }}</p>
+            <p><strong>Total Collected via UPI: </strong>{{ total_upi|default:"0.00" }}</p>
         </div>
     </div>
     {% endif %}
 
-    <!-- Dispensing History -->
+    <!-- Dispensing History List -->
     {% for patient, records in history %}
     <div class="card my-3">
         <div class="card-header-patient" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}">
@@ -70,6 +67,7 @@
                             <th>Consultation Cost</th>
                             <th>Total Cost</th>
                             <th>Dispensed Date</th>
+                            <th>Payment Method</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,8 +82,9 @@
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.cost|default:"0.00" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.total_cost|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">{{ record.payment_method|default:"Cash" }}</td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}
@@ -97,8 +96,9 @@
                                     <td>{{ record.procedure|default:"No procedure" }}</td>
                                     <td>{{ record.procedure_cost|default:"0.00" }}</td>
                                     <td>{{ record.consultation_charge|default:"0.00" }}</td>
-                                    <td>{{ record.cost|default:"0.00" }}</td>
+                                    <td>{{ record.total_cost|default:"0.00" }}</td>
                                     <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                                    <td>{{ record.payment_method|default:"Cash" }}</td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -113,7 +113,8 @@
     {% empty %}
     <p class="text-center text-muted">No dispensing history available.</p>
     {% endfor %}
-    
+
+    <!-- Pagination -->
     <div class="pagination mt-3">
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">

@@ -4,232 +4,201 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="text-center">
-                <h1 class="dispense-medication-heading">Dispense Medication</h1>
-                <p class="lead-text">Select a patient and medications, procedures, and consultation to calculate the total cost.</p>
-                <hr class="hr-style">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="text-center">
+        <h1 class="dispense-medication-heading">Dispense Medication</h1>
+        <p class="lead-text">Select a patient and medications, procedures, and consultation to calculate the total cost.</p>
+        <hr class="hr-style">
+      </div>
+
+      <div class="card shadow-lg border-0 p-4">
+        <h3 class="dispense-medication-heading">Dispense Order</h3>
+        <form id="dispense-form" method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="dispense_medication">
+
+          <div class="form-group mt-3">
+            <label for="patient" class="form-label">Select Patient:</label>
+            <select name="patient_id" id="patient" class="form-control shadow-sm" required>
+              <option value="" disabled selected>Choose a patient</option>
+              {% for patient in patients %}
+                <option value="{{ patient.id }}">{{ patient.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div id="medication-fields">
+          </div>
+
+          <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
+
+          <div class="form-group mt-4">
+            <label for="procedure" class="form-label">Procedure: (Optional)</label>
+            <input type="text" name="procedure" id="procedure" class="form-control shadow-sm" placeholder="Enter procedure name">
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="procedure_cost" class="form-label">Procedure Cost (₹): (Optional)</label>
+            <input type="number" name="procedure_cost" id="procedure_cost" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
+          </div>
+
+          <div class="form-group mt-3">
+            <label for="consultation_charge" class="form-label">Consultation Charge (₹): (Optional)</label>
+            <input type="number" name="consultation_charge" id="consultation_charge" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
+          </div>
+
+          <!-- Grand total field is editable and has a name so its value is submitted -->
+          <div class="form-group mt-4">
+            <label for="grand-total" class="form-label">Grand Total (₹):</label>
+            <input type="number" name="grand_total" id="grand-total" class="form-control shadow-sm" value="0.00" step="0.01">
+          </div>
+
+          <!-- (Optional) Payment Method Options -->
+          <div class="form-group mt-3">
+            <label class="form-label">Payment Method:</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="payment_method" id="payment_cash" value="Cash" checked>
+              <label class="form-check-label" for="payment_cash">Cash</label>
             </div>
-
-            <div class="card shadow-lg border-0 p-4">
-                <h3 class="dispense-medication-heading">Dispense Order</h3>
-                <form id="dispense-form" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="dispense_medication">
-
-                    <div class="form-group mt-3">
-                        <label for="patient" class="form-label">Select Patient:</label>
-                        <select name="patient_id" id="patient" class="form-control shadow-sm" required>
-                            <option value="" disabled selected>Choose a patient</option>
-                            {% for patient in patients %}
-                                <option value="{{ patient.id }}">{{ patient.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div id="medication-fields">
-                    </div>
-
-                    <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
-
-                    <div class="form-group mt-4">
-                        <label for="procedure" class="form-label">Procedure: (Optional)</label>
-                        <input 
-                            type="text" 
-                            name="procedure" 
-                            id="procedure" 
-                            class="form-control shadow-sm" 
-                            placeholder="Enter procedure name"
-                        />
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <label for="procedure_cost" class="form-label">Procedure Cost (₹): (Optional)</label>
-                        <input 
-                            type="number" 
-                            name="procedure_cost" 
-                            id="procedure_cost" 
-                            class="form-control shadow-sm" 
-                            min="0" 
-                            value="0.0"
-                            step="0.01"
-                        />
-                    </div>
-
-                    <div class="form-group mt-3">
-                        <label for="consultation_charge" class="form-label">Consultation Charge (₹): (Optional)</label>
-                        <input 
-                            type="number" 
-                            name="consultation_charge" 
-                            id="consultation_charge" 
-                            class="form-control shadow-sm" 
-                            min="0" 
-                            value="0.0"
-                            step="0.01"
-                        />
-                    </div>
-
-                    <div class="form-group mt-4">
-                        <label for="grand-total" class="form-label">Grand Total (₹):</label>
-                        <input type="number" id="grand-total" class="form-control shadow-sm" value="0.00" step="0.01" />
-                    </div>
-
-                    <button type="submit" class="btn btn-submit btn-block mt-4">Dispense Order</button>
-                </form>
-                <div id="status-message" class="mt-3"></div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="payment_method" id="payment_upi" value="UPI">
+              <label class="form-check-label" for="payment_upi">UPI</label>
             </div>
-        </div>
+          </div>
+
+          <button type="submit" class="btn btn-submit btn-block mt-4">Dispense Order</button>
+        </form>
+        <div id="status-message" class="mt-3"></div>
+      </div>
     </div>
+  </div>
 </div>
 
 <script>
+// Function to initialize Select2 on any medication select element
+function initializeMedicationSelect(selector) {
+    $(selector).select2({
+        placeholder: "Search Medication...",
+        allowClear: true,
+        width: "100%"
+    });
+}
+
 // Add Medication Input dynamically
+let fieldCount = 0;
 document.getElementById('add-medication').addEventListener('click', function () {
+    fieldCount++;
     const medicationFieldHTML = `
-        <div class="form-group mt-3 medication-field">
-            <label for="medication" class="form-label">Select Medication:</label><br>
-            <select name="medications[]" class="form-control shadow-sm medication-select" required>
+        <div class="form-group mt-3 medication-field" id="medication-field-${fieldCount}">
+            <label for="medication-${fieldCount}" class="form-label">Select Medication:</label><br>
+            <select name="medications[]" id="medication-${fieldCount}" class="form-control shadow-sm medication-select" required>
                 <option value="" disabled selected>Choose a medication</option>
                 {% for medication in medications %}
                     <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
                 {% endfor %}
-            </select><br>
+            </select><br><br>
 
-            <label for="quantity" class="form-label">Quantity:</label>
-            <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" step="0.01" required placeholder="Enter quantity" /><br>
+            <label for="quantity-${fieldCount}" class="form-label">Quantity:</label>
+            <input type="number" name="quantities[]" id="quantity-${fieldCount}" class="form-control shadow-sm quantity-input" min="1" step="0.01" required placeholder="Enter quantity"><br>
 
-            <label for="price" class="form-label">Price per Unit (₹):</label>
-            <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit" /><br>
+            <label for="price-${fieldCount}" class="form-label">Price per Unit (₹):</label>
+            <input type="number" name="prices[]" id="price-${fieldCount}" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit"><br>
 
-            <label for="total" class="form-label">Total (₹):</label>
-            <input type="text" class="form-control shadow-sm total-field" value="₹0.00" /><br>
+            <label for="total-${fieldCount}" class="form-label">Total (₹):</label>
+            <input type="text" id="total-${fieldCount}" class="form-control shadow-sm total-field" value="₹0.00" readonly><br>
 
             <!-- Remove Button -->
             <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
         </div>
     `;
     document.getElementById('medication-fields').insertAdjacentHTML('beforeend', medicationFieldHTML);
+    // Initialize Select2 on the new medication select
+    initializeMedicationSelect(`#medication-${fieldCount}`);
 });
 
-// Event delegation for dynamically added elements
+// Event delegation for input on medication fields
 document.getElementById('medication-fields').addEventListener('input', function (e) {
-    if (
-        e.target.classList.contains('quantity-input') || 
-        e.target.classList.contains('price-input')
-    ) {
+    if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
         updateFieldTotal(e.target.closest('.medication-field'));
     }
     updateGrandTotal();
 });
 
-// Remove Medication Input dynamically
+// Remove medication field on remove button click
 document.getElementById('medication-fields').addEventListener('click', function (e) {
     if (e.target.classList.contains('remove-medication')) {
-        const fieldToRemove = e.target.closest('.medication-field');
-        fieldToRemove.remove();
+        e.target.closest('.medication-field').remove();
         updateGrandTotal();
     }
 });
 
 // Update the total for a single medication field
 function updateFieldTotal(medicationField) {
-    const quantity = parseInt(medicationField.querySelector('.quantity-input').value || 0, 10);
+    const quantity = parseFloat(medicationField.querySelector('.quantity-input').value || 0);
     const price = parseFloat(medicationField.querySelector('.price-input').value || 0);
     const totalField = medicationField.querySelector('.total-field');
-
     const total = quantity * price;
     totalField.value = `₹${total.toFixed(2)}`;
-}
-
-// Add procedure cost to grand total
-function updateProcedureTotal() {
-    const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
-    updateGrandTotal(); 
-}
-
-// Add consultation charge to grand total
-function updateConsultationTotal() {
-    const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
-    updateGrandTotal();
 }
 
 // Update grand total for all medications, procedure, and consultation
 function updateGrandTotal() {
     let grandTotal = 0;
-    document.querySelectorAll('.total-field').forEach(totalField => {
-        const total = parseFloat(totalField.value.replace('₹', '') || 0);
-        grandTotal += total;
+    document.querySelectorAll('.total-field').forEach(field => {
+        const value = parseFloat(field.value.replace('₹', '') || 0);
+        grandTotal += value;
     });
     const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
     const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
     grandTotal += procedureCost + consultationCharge;
-
-    // Update the editable grand total field
+    // Update the grand total input field (editable)
     document.getElementById('grand-total').value = grandTotal.toFixed(2);
 }
 
-// Handle manual input to override the grand total
-document.getElementById('grand-total').addEventListener('input', function() {
-    // If the grand total is manually changed, prevent further automatic updates
-    // You can also add custom logic here if needed to validate the manual value
-});
-
-// Event listeners
-document.getElementById('procedure_cost').addEventListener('input', updateProcedureTotal);
-document.getElementById('consultation_charge').addEventListener('input', updateConsultationTotal);
+document.getElementById('procedure_cost').addEventListener('input', updateGrandTotal);
+document.getElementById('consultation_charge').addEventListener('input', updateGrandTotal);
 
 // Form submission via AJAX
 document.getElementById('dispense-form').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  const patientField = document.getElementById('patient');
-  const medicationFields = document.querySelectorAll('.medication-field');
-  const statusMessage = document.getElementById('status-message');
-
-  // Reset previous status message
-  statusMessage.textContent = '';
-  statusMessage.style.color = '';
-
-  // Validate patient selection
-  if (!patientField.value) {
-    statusMessage.textContent = "Please select a patient.";
-    statusMessage.style.color = "red";
-    return;
-  }
-
-  // Submit form via AJAX if validation passes
-  const formData = new FormData(this);
-
-  fetch("", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
-    },
-    body: formData,
-  })
-  .then(response => response.json()) // Parse the JSON response here
-  .then(data => {
-    if (data.status === "success") {
-      // Show success message
-      statusMessage.textContent = data.message;
-      statusMessage.style.color = "green";
-
-      // Reset the form
-      this.reset();
-      document.getElementById('medication-fields').innerHTML = '';
-      document.getElementById('grand-total').value = `0.00`;
-    } else {
-      // Show error message
-      statusMessage.textContent = data.message;
-      statusMessage.style.color = "red";
+    e.preventDefault();
+    const statusMessage = document.getElementById('status-message');
+    statusMessage.textContent = '';
+    statusMessage.style.color = '';
+    
+    const patientField = document.getElementById('patient');
+    if (!patientField.value) {
+        statusMessage.textContent = "Please select a patient.";
+        statusMessage.style.color = "red";
+        return;
     }
-  })
-  .catch(error => {
-    console.error("Error dispensing medications:", error);
-    statusMessage.textContent = "An unexpected error occurred.";
-    statusMessage.style.color = "red";
-  });
+    
+    const formData = new FormData(this);
+    fetch("", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "success") {
+            statusMessage.textContent = data.message;
+            statusMessage.style.color = "green";
+            this.reset();
+            document.getElementById('medication-fields').innerHTML = '';
+            document.getElementById('grand-total').value = "0.00";
+        } else {
+            statusMessage.textContent = data.message;
+            statusMessage.style.color = "red";
+        }
+    })
+    .catch(error => {
+        console.error("Error dispensing medications:", error);
+        statusMessage.textContent = "An unexpected error occurred.";
+        statusMessage.style.color = "red";
+    });
 });
 </script>
 {% endblock %}

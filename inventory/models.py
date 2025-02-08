@@ -45,39 +45,17 @@ class DispensedMedication(models.Model):
 
 
 class DispensedMedicationHistory(models.Model):
-    patient = models.ForeignKey(
-        Patient, on_delete=models.CASCADE, related_name="dispensed_histories"
-    )
-    medication_details = models.JSONField(default=list)  # Storing medication details as JSON
-    procedure = models.CharField(
-        max_length=255, blank=True, null=True
-    )  # Procedure name (if any)
-    procedure_cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0.00
-    )  # Procedure cost
-    consultation_charge = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0.00
-    )  # Consultation charge
-    cost = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0.00
-    )  # Total cost, includes all charges
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    medication_details = models.JSONField(blank=True, null=True)  # Use JSONField if possible, or TextField with JSON stored as string
+    procedure = models.CharField(max_length=255, blank=True, null=True)
+    procedure_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    consultation_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(max_length=10, default="Cash")  # "Cash" or "UPI"
     date_dispensed = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"History for {self.patient.name} on {self.date_dispensed}"
-
-
-    def save(self, *args, **kwargs):
-        # Convert float costs in medication_details to Decimal and calculate the total cost
-        total_medication_cost = sum(
-            Decimal(str(item.get("cost", 0.00))) for item in self.medication_details
-        )
-        self.total_cost = (
-            self.procedure_cost
-            + self.consultation_charge
-            + total_medication_cost
-        )
-        super().save(*args, **kwargs)
+        return f"Dispensing History for {self.patient.name} on {self.date_dispensed}"
 
 class Billing(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)

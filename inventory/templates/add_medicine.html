@@ -25,7 +25,7 @@
 
                     <form method="POST" class="mt-4">
                         {% csrf_token %}
-                        
+
                         <div class="form-group">
                             <label for="medicine" class="form-label">Choose Medicine:</label>
                             <select id="medicine" name="medicine" class="form-control" required>
@@ -53,29 +53,29 @@
                             <label for="mr_number" class="form-label">MR Number:</label>
                             <input type="text" id="mr_number" name="mr_number" class="form-control" placeholder="Enter the MR Name and Number" required>
                         </div>
-                        
+
                         <div class="form-group mt-4 text-center">
                             <button type="submit" name="action" value="add_or_update" class="btn btn-submit btn-lg">Add or Update Medicine</button>
                             <button type="submit" name="action" value="delete" class="btn btn-danger btn-lg">Delete Medicine</button>
                         </div>
                     </form>
                 </div>
-            </div>            
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Include jQuery and Select2 JavaScript libraries -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <!-- Initialize select2 for search functionality and auto-populate fields -->
 <script>
     $(document).ready(function() {
         // Initialize select2 for search
-        $('#medicine').select2();
+        $('#medicine').select2({
+            placeholder: "Search or select a medicine",
+            allowClear: true, // Allows clearing selection
+            width: "100%", // Ensures dropdown fits container
+        }).next(".select2-container").addClass("form-control");
 
-        // When a medicine is selected
+        // Auto-populate fields based on selected medicine
         $('#medicine').change(function() {
             var selectedMedicine = $(this).find('option:selected');
             var medicineId = selectedMedicine.val();
