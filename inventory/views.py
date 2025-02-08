@@ -142,17 +142,17 @@ def patient_details(request):
     search_query = request.GET.get('search')
     if search_query:
         patients = Patient.objects.filter(
-            Q(name__icontains=search_query) | 
-            Q(contact__icontains=search_query) | 
+            Q(name__icontains=search_query) |
+            Q(contact__icontains=search_query) |
             Q(diagnosis__icontains=search_query)
         )
     else:
         patients = Patient.objects.all()
-    
+
     paginator = Paginator(patients, 10)  # Show 10 patients per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    
+
     return render(request, 'patient_details.html', {'page_obj': page_obj, 'search_query': search_query})
 
 # Adding a new patient
@@ -162,7 +162,7 @@ def add_patient(request):
         age = request.POST.get("age")
         contact = request.POST.get("contact", "")
         diagnosis = request.POST.get("diagnosis", "")  # Handle diagnosis field
-        
+
         if name and age:
             patient = Patient.objects.create(name=name, age=age, contact=contact, diagnosis=diagnosis)
             messages.success(request, f"Patient {name} added successfully!")
@@ -273,7 +273,6 @@ def dispense_medication_view(request):
     medications = Medication.objects.all()
     patients = Patient.objects.all()
     return render(request, "dispense_medication.html", {"medications": medications, "patients": patients})
-
 
 @login_required
 def dispensing_history_view(request):

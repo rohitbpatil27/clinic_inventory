@@ -20,7 +20,7 @@ class Patient(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class DispensedMedication(models.Model):
     patient = models.ForeignKey(
         Patient, on_delete=models.CASCADE, related_name="dispensed_medications"
