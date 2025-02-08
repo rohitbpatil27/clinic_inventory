@@ -1,7 +1,6 @@
 from django.db import models
 from decimal import Decimal
 
-
 class Medication(models.Model):
     name = models.CharField(max_length=100)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
@@ -43,15 +42,16 @@ class DispensedMedication(models.Model):
         self.cost = self.quantity * self.price
         super().save(*args, **kwargs)
 
-
 class DispensedMedicationHistory(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    medication_details = models.JSONField(blank=True, null=True)  # Use JSONField if possible, or TextField with JSON stored as string
+    medication_details = models.JSONField(blank=True, null=True)  # Stores medication details as JSON
     procedure = models.CharField(max_length=255, blank=True, null=True)
     procedure_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     consultation_charge = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.CharField(max_length=10, default="Cash")  # "Cash" or "UPI"
+    # New fields for capturing payment breakdown
+    cash_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    upi_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     date_dispensed = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

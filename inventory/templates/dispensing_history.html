@@ -8,13 +8,16 @@
     <form method="get" action="" class="mb-4">
         <div class="row g-3">
             <div class="col-md-3">
-                <input type="date" name="from_date" class="form-control" placeholder="From Date" value="{{ request.GET.from_date|default:'' }}">
+                <input type="date" name="from_date" class="form-control" placeholder="From Date" 
+                       value="{{ request.GET.from_date|default:'' }}">
             </div>
             <div class="col-md-3">
-                <input type="date" name="to_date" class="form-control" placeholder="To Date" value="{{ request.GET.to_date|default:'' }}">
+                <input type="date" name="to_date" class="form-control" placeholder="To Date" 
+                       value="{{ request.GET.to_date|default:'' }}">
             </div>
             <div class="col-md-4">
-                <input type="text" name="search" class="form-control" placeholder="Search Patient" value="{{ request.GET.search|default:'' }}">
+                <input type="text" name="search" class="form-control" placeholder="Search Patient" 
+                       value="{{ request.GET.search|default:'' }}">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
@@ -84,7 +87,17 @@
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.total_cost|default:"0.00" }}</td>
                                         <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.payment_method|default:"Cash" }}</td>
+                                        <td rowspan="{{ record.medication_details|length }}">
+                                            {% if record.cash_amount > 0 and record.upi_amount > 0 %}
+                                                Mixed
+                                            {% elif record.cash_amount > 0 %}
+                                                Cash
+                                            {% elif record.upi_amount > 0 %}
+                                                UPI
+                                            {% else %}
+                                                Not Specified
+                                            {% endif %}
+                                        </td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}
@@ -98,7 +111,17 @@
                                     <td>{{ record.consultation_charge|default:"0.00" }}</td>
                                     <td>{{ record.total_cost|default:"0.00" }}</td>
                                     <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
-                                    <td>{{ record.payment_method|default:"Cash" }}</td>
+                                    <td>
+                                        {% if record.cash_amount > 0 and record.upi_amount > 0 %}
+                                            Mixed
+                                        {% elif record.cash_amount > 0 %}
+                                            Cash
+                                        {% elif record.upi_amount > 0 %}
+                                            UPI
+                                        {% else %}
+                                            Not Specified
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}

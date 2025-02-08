@@ -210,14 +210,19 @@ def dispense_medication_view(request):
                 procedure = request.POST.get("procedure", "")
                 procedure_cost = Decimal(request.POST.get("procedure_cost", "0.0").strip() or "0.0")
                 consultation_charge = Decimal(request.POST.get("consultation_charge", "0.0").strip() or "0.0")
-                # Use the grand_total provided by the user
+                cash_amount = Decimal(request.POST.get("cash_amount", "0.0").strip() or "0.0")
+                upi_amount = Decimal(request.POST.get("upi_amount", "0.0").strip() or "0.0")
+                # Use the grand total from the form (manually entered/edited)
                 grand_total = Decimal(request.POST.get("grand_total", "0.0").strip() or "0.0")
+                
                 if len(medications) != len(quantities) or len(medications) != len(prices):
                     return JsonResponse({"status": "error", "message": "Mismatch between medications, quantities, and prices."})
                 if not (medications or procedure or consultation_charge):
                     return JsonResponse({"status": "error", "message": "Please add at least one medication or Procedure or Consultation."})
+                
                 total_medication_cost = Decimal(0)
                 medication_details = []
+
                 with transaction.atomic():
                     for medication_id, quantity_str, price_str in zip(medications, quantities, prices):
                         try:
@@ -250,8 +255,10 @@ def dispense_medication_view(request):
                             return JsonResponse({"status": "error", "message": "Invalid input for quantity or price."})
                         except Exception as e:
                             return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
-                    # Use the user-entered grand_total as the final total cost
+                    
+                    # Use the manually entered grand_total as the final total cost
                     total_cost = grand_total
+
                     DispensedMedicationHistory.objects.create(
                         patient=patient,
                         medication_details=medication_details,
@@ -259,14 +266,22 @@ def dispense_medication_view(request):
                         procedure_cost=procedure_cost,
                         consultation_charge=consultation_charge,
                         total_cost=total_cost,
-                        payment_method=request.POST.get("payment_method", "Cash")
+                        cash_amount=cash_amount,
+                        upi_amount=upi_amount,
                     )
+
                     Billing.objects.create(
                         patient=patient,
                         total_amount=total_cost,
                         description="Dispense Medications"
                     )
-                    return JsonResponse({"status": "success", "message": "Medications dispensed successfully.", "total_cost": str(total_cost)})
+
+                    return JsonResponse({
+                        "status": "success",
+                        "message": "Medications dispensed successfully.",
+                        "total_cost": str(total_cost)
+                    })
+
             except Exception as e:
                 return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
         return JsonResponse({"status": "error", "message": "Invalid action."})
@@ -287,21 +302,21 @@ def dispensing_history_view(request):
         .order_by('-date_dispensed')
     )
 
-    # Apply search query filter on patient name or contact (if contact exists)
+    # Apply search query filter on patient name or contact (if available)
     if search_query:
         all_history = all_history.filter(
             Q(patient__name__icontains=search_query) |
             Q(patient__contact__icontains=search_query)
         )
 
-    # Apply date range filter if provided
+    # Apply date range filter if both dates are provided
     if from_date and to_date:
         try:
             all_history = all_history.filter(date_dispensed__date__range=[from_date, to_date])
         except ValueError:
             logger.error(f"Invalid date range: {from_date} to {to_date}")
 
-    # Initialize totals
+    # Initialize total sums (as Decimal)
     total_medication_cost = Decimal(0)
     total_procedure_cost = Decimal(0)
     total_consultation_cost = Decimal(0)
@@ -310,7 +325,7 @@ def dispensing_history_view(request):
     # Group records by patient
     grouped_history = {}
     for record in all_history:
-        # medication_details is stored as JSON (a list of dictionaries)
+        # medication_details is stored as JSON (a list of dicts)
         if isinstance(record.medication_details, list):
             medication_cost = sum(Decimal(medication.get('cost', 0)) for medication in record.medication_details)
         else:
@@ -325,13 +340,13 @@ def dispensing_history_view(request):
             grouped_history[record.patient] = []
         grouped_history[record.patient].append(record)
 
-    # Aggregate payment method totals
-    total_cash = all_history.filter(payment_method="Cash").aggregate(total=Sum("total_cost"))["total"] or Decimal("0.00")
-    total_upi = all_history.filter(payment_method="UPI").aggregate(total=Sum("total_cost"))["total"] or Decimal("0.00")
+    # Aggregate total cash and UPI amounts using the new fields
+    total_cash = all_history.aggregate(total=Sum("cash_amount"))["total"] or Decimal("0.00")
+    total_upi = all_history.aggregate(total=Sum("upi_amount"))["total"] or Decimal("0.00")
 
     # Paginate grouped history (grouped by patient)
     grouped_history_list = list(grouped_history.items())
-    paginator = Paginator(grouped_history_list, 10)  # 10 patients per page
+    paginator = Paginator(grouped_history_list, 10)  # Show 10 patients per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

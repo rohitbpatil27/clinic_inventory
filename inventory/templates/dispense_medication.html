@@ -6,6 +6,7 @@
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
+      <!-- Header Section -->
       <div class="text-center">
         <h1 class="dispense-medication-heading">Dispense Medication</h1>
         <p class="lead-text">
@@ -14,13 +15,14 @@
         <hr class="hr-style">
       </div>
 
+      <!-- Main Card Container -->
       <div class="card shadow-lg border-0 p-4">
         <h3 class="dispense-medication-heading">Dispense Order</h3>
         <form id="dispense-form" method="post">
           {% csrf_token %}
           <input type="hidden" name="action" value="dispense_medication">
 
-          <!-- Patient select with search via Select2 -->
+          <!-- Patient Selection with Select2 Search -->
           <div class="form-group mt-3">
             <label for="patient" class="form-label">Select Patient:</label>
             <select name="patient_id" id="patient" class="form-control shadow-sm" required>
@@ -31,38 +33,36 @@
             </select>
           </div>
 
-          <!-- Medication fields (added dynamically) -->
+          <!-- Medication Fields (added dynamically) -->
           <div id="medication-fields"></div>
 
-          <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">Add Medication</button>
+          <!-- Button to add medication fields -->
+          <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">
+            Add Medication
+          </button>
 
-          <!-- Procedure and Charges -->
+          <!-- Procedure and Charges Inputs -->
           <div class="form-group mt-4">
             <label for="procedure" class="form-label">Procedure: (Optional)</label>
             <input type="text" name="procedure" id="procedure" class="form-control shadow-sm" placeholder="Enter procedure name">
           </div>
-
           <div class="form-group mt-3">
             <label for="procedure_cost" class="form-label">Procedure Cost (₹): (Optional)</label>
             <input type="number" name="procedure_cost" id="procedure_cost" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
           </div>
-
           <div class="form-group mt-3">
             <label for="consultation_charge" class="form-label">Consultation Charge (₹): (Optional)</label>
             <input type="number" name="consultation_charge" id="consultation_charge" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
           </div>
 
-          <!-- Payment Method Options -->
+          <!-- New Payment Fields for Partial Payments -->
           <div class="form-group mt-3">
-            <label class="form-label">Payment Method:</label><br>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="payment_method" id="payment_cash" value="Cash" checked>
-              <label class="form-check-label" for="payment_cash">Cash</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="payment_method" id="payment_upi" value="UPI">
-              <label class="form-check-label" for="payment_upi">UPI</label>
-            </div>
+            <label for="cash_amount" class="form-label">Cash Payment (₹):</label>
+            <input type="number" name="cash_amount" id="cash_amount" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
+          </div>
+          <div class="form-group mt-3">
+            <label for="upi_amount" class="form-label">UPI Payment (₹):</label>
+            <input type="number" name="upi_amount" id="upi_amount" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
           </div>
 
           <!-- Editable Grand Total Field -->
@@ -71,135 +71,140 @@
             <input type="number" name="grand_total" id="grand_total" class="form-control shadow-sm" value="0.00" step="0.01">
           </div>
 
+          <!-- Submit Button -->
           <button type="submit" class="btn btn-submit btn-block mt-4">Dispense Order</button>
         </form>
         <div id="status-message" class="mt-3"></div>
-      </div>
+      </div><!-- End Card -->
     </div>
   </div>
 </div>
 
+<!-- JavaScript Section -->
 <script>
-// Prevent the Enter key on the procedure field from submitting the form
-document.getElementById('procedure').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-  }
-});
-
-// Initialize select2 for the patient dropdown (if not already initialized in base.html)
-$(document).ready(function() {
-  $('#patient').select2({
-    placeholder: "Search Patient...",
-    allowClear: true,
-    width: "100%"
+  // Prevent the Enter key in the procedure field from submitting the form
+  document.getElementById('procedure').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
   });
-});
 
-// Function to add medication input dynamically
-document.getElementById('add-medication').addEventListener('click', function () {
-  const medicationFieldHTML = `
-    <div class="form-group mt-3 medication-field">
-      <label class="form-label">Select Medication:</label><br>
-      <select name="medications[]" class="form-control shadow-sm medication-select" required>
-        <option value="" disabled selected>Choose a medication</option>
-        {% for medication in medications %}
-          <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
-        {% endfor %}
-      </select><br><br>
-      <label class="form-label">Quantity:</label>
-      <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" step="0.01" required placeholder="Enter quantity"><br>
-      <label class="form-label">Price per Unit (₹):</label>
-      <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit"><br>
-      <label class="form-label">Total (₹):</label>
-      <input type="text" class="form-control shadow-sm total-field" value="₹0.00" readonly><br>
-      <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
-    </div>
-  `;
-  document.getElementById('medication-fields').insertAdjacentHTML('beforeend', medicationFieldHTML);
-  // Initialize select2 for the new medication select
-  $('.medication-select').select2({
-    placeholder: "Search Medication...",
-    allowClear: true,
-    width: "100%"
+  // Initialize Select2 for the patient dropdown
+  $(document).ready(function() {
+    $('#patient').select2({
+      placeholder: "Search Patient...",
+      allowClear: true,
+      width: "100%"
+    });
   });
-});
 
-// Update total for each medication field
-function updateFieldTotal(medicationField) {
-  const quantity = parseFloat(medicationField.querySelector('.quantity-input').value || 0);
-  const price = parseFloat(medicationField.querySelector('.price-input').value || 0);
-  const totalField = medicationField.querySelector('.total-field');
-  const total = quantity * price;
-  totalField.value = `₹${total.toFixed(2)}`;
-  updateGrandTotal();
-}
-
-// Update grand total for all medications, procedure, and consultation
-function updateGrandTotal() {
-  let grandTotal = 0;
-  document.querySelectorAll('.total-field').forEach(field => {
-    const value = parseFloat(field.value.replace('₹', '') || 0);
-    grandTotal += value;
+  // Function to add medication input fields dynamically
+  document.getElementById('add-medication').addEventListener('click', function () {
+    const medicationFieldHTML = `
+      <div class="form-group mt-3 medication-field">
+        <label class="form-label">Select Medication:</label><br>
+        <select name="medications[]" class="form-control shadow-sm medication-select" required>
+          <option value="" disabled selected>Choose a medication</option>
+          {% for medication in medications %}
+            <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
+          {% endfor %}
+        </select><br><br>
+        <label class="form-label">Quantity:</label>
+        <input type="number" name="quantities[]" class="form-control shadow-sm quantity-input" min="1" step="0.01" required placeholder="Enter quantity"><br>
+        <label class="form-label">Price per Unit (₹):</label>
+        <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit"><br>
+        <label class="form-label">Total (₹):</label>
+        <input type="text" class="form-control shadow-sm total-field" value="₹0.00" readonly><br>
+        <!-- Remove Button -->
+        <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
+      </div>
+    `;
+    document.getElementById('medication-fields').insertAdjacentHTML('beforeend', medicationFieldHTML);
+    // Initialize Select2 for the new medication select element
+    $('.medication-select').select2({
+      placeholder: "Search Medication...",
+      allowClear: true,
+      width: "100%"
+    });
   });
-  const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
-  const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
-  grandTotal += procedureCost + consultationCharge;
-  document.getElementById('grand_total').value = grandTotal.toFixed(2);
-}
 
-// Event delegation for dynamic elements in medication-fields
-document.getElementById('medication-fields').addEventListener('input', function (e) {
-  if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
-    updateFieldTotal(e.target.closest('.medication-field'));
-  }
-  updateGrandTotal();
-});
-
-// Event delegation for remove buttons
-document.getElementById('medication-fields').addEventListener('click', function (e) {
-  if (e.target.classList.contains('remove-medication')) {
-    e.target.closest('.medication-field').remove();
+  // Function to update the total for a single medication field
+  function updateFieldTotal(medicationField) {
+    const quantity = parseFloat(medicationField.querySelector('.quantity-input').value || 0);
+    const price = parseFloat(medicationField.querySelector('.price-input').value || 0);
+    const totalField = medicationField.querySelector('.total-field');
+    const total = quantity * price;
+    totalField.value = `₹${total.toFixed(2)}`;
     updateGrandTotal();
   }
-});
 
-// Event listeners for procedure and consultation cost changes
-document.getElementById('procedure_cost').addEventListener('input', updateGrandTotal);
-document.getElementById('consultation_charge').addEventListener('input', updateGrandTotal);
+  // Function to update grand total for all fields
+  function updateGrandTotal() {
+    let grandTotal = 0;
+    document.querySelectorAll('.total-field').forEach(field => {
+      const value = parseFloat(field.value.replace('₹', '') || 0);
+      grandTotal += value;
+    });
+    const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
+    const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
+    grandTotal += procedureCost + consultationCharge;
+    // Update the editable grand total field
+    document.getElementById('grand_total').value = grandTotal.toFixed(2);
+  }
 
-// Form submission via AJAX
-document.getElementById('dispense-form').addEventListener('submit', function (e) {
-  e.preventDefault();
-  const statusMessage = document.getElementById('status-message');
-  statusMessage.textContent = '';
-  statusMessage.style.color = '';
-  const formData = new FormData(this);
-  fetch("", {
-    method: "POST",
-    headers: {
-      "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
-    },
-    body: formData,
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.status === "success") {
-      statusMessage.textContent = data.message;
-      statusMessage.style.color = "green";
-      this.reset();
-      document.getElementById('medication-fields').innerHTML = '';
-      document.getElementById('grand_total').value = "0.00";
-    } else {
-      statusMessage.textContent = data.message;
-      statusMessage.style.color = "red";
+  // Event delegation for dynamic medication fields
+  document.getElementById('medication-fields').addEventListener('input', function (e) {
+    if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
+      updateFieldTotal(e.target.closest('.medication-field'));
     }
-  })
-  .catch(error => {
-    console.error("Error dispensing medications:", error);
-    statusMessage.textContent = "An unexpected error occurred.";
-    statusMessage.style.color = "red";
+    updateGrandTotal();
   });
-});
+
+  // Event delegation for remove buttons
+  document.getElementById('medication-fields').addEventListener('click', function (e) {
+    if (e.target.classList.contains('remove-medication')) {
+      e.target.closest('.medication-field').remove();
+      updateGrandTotal();
+    }
+  });
+
+  // Event listeners for procedure and consultation cost changes
+  document.getElementById('procedure_cost').addEventListener('input', updateGrandTotal);
+  document.getElementById('consultation_charge').addEventListener('input', updateGrandTotal);
+
+  // Form submission via AJAX
+  document.getElementById('dispense-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const statusMessage = document.getElementById('status-message');
+    statusMessage.textContent = '';
+    statusMessage.style.color = '';
+    const formData = new FormData(this);
+    fetch("", {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": document.querySelector('[name="csrfmiddlewaretoken"]').value,
+      },
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        statusMessage.textContent = data.message;
+        statusMessage.style.color = "green";
+        // Reset the form
+        this.reset();
+        document.getElementById('medication-fields').innerHTML = '';
+        document.getElementById('grand_total').value = "0.00";
+      } else {
+        statusMessage.textContent = data.message;
+        statusMessage.style.color = "red";
+      }
+    })
+    .catch(error => {
+      console.error("Error dispensing medications:", error);
+      statusMessage.textContent = "An unexpected error occurred.";
+      statusMessage.style.color = "red";
+    });
+  });
 </script>
 {% endblock %}
