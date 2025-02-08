@@ -2,166 +2,182 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="disp-hist-heading">Dispensing History</h1>
+  <h1 class="disp-hist-heading text-center mb-4">Dispensing History</h1>
 
-    <!-- Filter and Search Form -->
-    <form method="get" action="" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-3">
-                <input type="date" name="from_date" class="form-control" placeholder="From Date" 
-                       value="{{ request.GET.from_date|default:'' }}">
-            </div>
-            <div class="col-md-3">
-                <input type="date" name="to_date" class="form-control" placeholder="To Date" 
-                       value="{{ request.GET.to_date|default:'' }}">
-            </div>
-            <div class="col-md-4">
-                <input type="text" name="search" class="form-control" placeholder="Search Patient" 
-                       value="{{ request.GET.search|default:'' }}">
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- Display Date Range and Search Query -->
-    {% if from_date and to_date %}
-        <p class="text-muted">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
-    {% endif %}
-    {% if search_query %}
-        <p class="text-muted">Showing results for "<strong>{{ search_query }}</strong>"</p>
-    {% endif %}
-
-    <!-- Dispensing History Summary -->
-    {% if history %}
-    <div class="card my-3">
-        <div class="card-header">
-            <h5 class="card-title">Summary of Costs</h5>
-        </div>
-        <div class="card-body">
-            <p><strong>Total Medication Cost: </strong>{{ total_medication_cost|default:"0.00" }}</p>
-            <p><strong>Total Procedure Cost: </strong>{{ total_procedure_cost|default:"0.00" }}</p>
-            <p><strong>Total Consultation Cost: </strong>{{ total_consultation_cost|default:"0.00" }}</p>
-            <p><strong>Total Cost: </strong>{{ total_cost|default:"0.00" }}</p>
-            <p><strong>Total Collected via Cash: </strong>{{ total_cash|default:"0.00" }}</p>
-            <p><strong>Total Collected via UPI: </strong>{{ total_upi|default:"0.00" }}</p>
-        </div>
+  <!-- Filter and Search Form -->
+  <form method="get" action="" class="mb-4">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <input type="date" name="from_date" class="form-control" placeholder="From Date" 
+               value="{{ request.GET.from_date|default:'' }}">
+      </div>
+      <div class="col-md-3">
+        <input type="date" name="to_date" class="form-control" placeholder="To Date" 
+               value="{{ request.GET.to_date|default:'' }}">
+      </div>
+      <div class="col-md-4">
+        <input type="text" name="search" class="form-control" placeholder="Search Patient" 
+               value="{{ request.GET.search|default:'' }}">
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
+      </div>
     </div>
-    {% endif %}
+  </form>
 
-    <!-- Dispensing History List -->
-    {% for patient, records in history %}
-    <div class="card my-3">
-        <div class="card-header-patient" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}">
-            <h5 class="card-header-patient mb-0">{{ patient.name }}</h5>
-        </div>
-        <div id="patient-{{ patient.id }}" class="collapse">
-            <div class="card-body">
-                {% if records %}
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>Medication</th>
-                            <th>Quantity</th>
-                            <th>Medication Cost</th>
-                            <th>Procedure</th>
-                            <th>Procedure Cost</th>
-                            <th>Consultation Cost</th>
-                            <th>Total Cost</th>
-                            <th>Dispensed Date</th>
-                            <th>Payment Method</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in records %}
-                            {% if record.medication_details %}
-                                {% for medication in record.medication_details %}
-                                <tr>
-                                    <td>{{ medication.name }}</td>
-                                    <td>{{ medication.quantity|default:"0.0" }}</td>
-                                    <td>{{ medication.cost|default:"0.0" }}</td>
-                                    {% if forloop.first %}
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.total_cost|default:"0.00" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
-                                        <td rowspan="{{ record.medication_details|length }}">
-                                            {% if record.cash_amount > 0 and record.upi_amount > 0 %}
-                                                Mixed
-                                            {% elif record.cash_amount > 0 %}
-                                                Cash
-                                            {% elif record.upi_amount > 0 %}
-                                                UPI
-                                            {% else %}
-                                                Not Specified
-                                            {% endif %}
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td>No medications</td>
-                                    <td>0.0</td>
-                                    <td>0.0</td>
-                                    <td>{{ record.procedure|default:"No procedure" }}</td>
-                                    <td>{{ record.procedure_cost|default:"0.00" }}</td>
-                                    <td>{{ record.consultation_charge|default:"0.00" }}</td>
-                                    <td>{{ record.total_cost|default:"0.00" }}</td>
-                                    <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
-                                    <td>
-                                        {% if record.cash_amount > 0 and record.upi_amount > 0 %}
-                                            Mixed
-                                        {% elif record.cash_amount > 0 %}
-                                            Cash
-                                        {% elif record.upi_amount > 0 %}
-                                            UPI
-                                        {% else %}
-                                            Not Specified
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <p class="text-center text-muted">No dispensing history available for this patient.</p>
-                {% endif %}
-            </div>
-        </div>
+  <!-- Display Date Range and Search Query -->
+  {% if from_date and to_date %}
+    <p class="text-muted text-center">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
+  {% endif %}
+  {% if search_query %}
+    <p class="text-muted text-center">Showing results for "<strong>{{ search_query }}</strong>"</p>
+  {% endif %}
+
+  <!-- Dispensing History Summary -->
+  {% if history %}
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="card-title">Summary of Costs</h5>
     </div>
-    {% empty %}
-    <p class="text-center text-muted">No dispensing history available.</p>
-    {% endfor %}
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <p><strong>Total Medication Cost:</strong> {{ total_medication_cost|default:"0.00"|floatformat:2 }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Total Procedure Cost:</strong> {{ total_procedure_cost|default:"0.00"|floatformat:2 }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Total Consultation Cost:</strong> {{ total_consultation_cost|default:"0.00"|floatformat:2 }}</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <p><strong>Total Cost:</strong> {{ total_cost|default:"0.00"|floatformat:2 }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Total Collected via Cash:</strong> {{ total_cash|default:"0.00"|floatformat:2 }}</p>
+        </div>
+        <div class="col-md-4">
+          <p><strong>Total Collected via UPI:</strong> {{ total_upi|default:"0.00"|floatformat:2 }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
-    <!-- Pagination -->
-    <div class="pagination mt-3">
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if history.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ history.previous_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-                {% for num in history.paginator.page_range %}
-                    <li class="page-item {% if history.number == num %}active{% endif %}">
-                        <a class="page-link" href="?page={{ num }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}">{{ num }}</a>
-                    </li>
+  <!-- Dispensing History List -->
+  {% for patient, records in history %}
+  <div class="card mb-3">
+    <div class="card-header bg-light" data-bs-toggle="collapse" data-bs-target="#patient-{{ patient.id }}" style="cursor: pointer;">
+      <h5 class="mb-0">{{ patient.name }}</h5>
+    </div>
+    <div id="patient-{{ patient.id }}" class="collapse">
+      <div class="card-body">
+        {% if records %}
+        <table class="table table-bordered table-striped table-hover">
+          <thead class="bg-light">
+            <tr>
+              <th>Medication</th>
+              <th>Quantity</th>
+              <th>Medication Cost</th>
+              <th>Procedure</th>
+              <th>Procedure Cost</th>
+              <th>Consultation Cost</th>
+              <th>Total Cost</th>
+              <th>Dispensed Date</th>
+              <th>Payment Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in records %}
+              {% if record.medication_details %}
+                {% for medication in record.medication_details %}
+                <tr>
+                  <td>{{ medication.name }}</td>
+                  <td>{{ medication.quantity|default:"0.0"|floatformat:2 }}</td>
+                  <td>{{ medication.cost|default:"0.0"|floatformat:2 }}</td>
+                  {% if forloop.first %}
+                    <td rowspan="{{ record.medication_details|length }}">{{ record.procedure|default:"No procedure" }}</td>
+                    <td rowspan="{{ record.medication_details|length }}">{{ record.procedure_cost|default:"0.00"|floatformat:2 }}</td>
+                    <td rowspan="{{ record.medication_details|length }}">{{ record.consultation_charge|default:"0.00"|floatformat:2 }}</td>
+                    <td rowspan="{{ record.medication_details|length }}">{{ record.total_cost|default:"0.00"|floatformat:2 }}</td>
+                    <td rowspan="{{ record.medication_details|length }}">{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                    <td rowspan="{{ record.medication_details|length }}">
+                      {% if record.cash_amount > 0 and record.upi_amount > 0 %}
+                        Mixed
+                      {% elif record.cash_amount > 0 %}
+                        Cash
+                      {% elif record.upi_amount > 0 %}
+                        UPI
+                      {% else %}
+                        Not Specified
+                      {% endif %}
+                    </td>
+                  {% endif %}
+                </tr>
                 {% endfor %}
-                {% if history.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ history.next_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+              {% else %}
+                <tr>
+                  <td>No medications</td>
+                  <td>0.0</td>
+                  <td>0.0</td>
+                  <td>{{ record.procedure|default:"No procedure" }}</td>
+                  <td>{{ record.procedure_cost|default:"0.00"|floatformat:2 }}</td>
+                  <td>{{ record.consultation_charge|default:"0.00"|floatformat:2 }}</td>
+                  <td>{{ record.total_cost|default:"0.00"|floatformat:2 }}</td>
+                  <td>{{ record.date_dispensed|date:"d/m/Y h:i A" }}</td>
+                  <td>
+                    {% if record.cash_amount > 0 and record.upi_amount > 0 %}
+                      Mixed
+                    {% elif record.cash_amount > 0 %}
+                      Cash
+                    {% elif record.upi_amount > 0 %}
+                      UPI
+                    {% else %}
+                      Not Specified
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p class="text-center text-muted">No dispensing history available for this patient.</p>
+        {% endif %}
+      </div>
     </div>
+  </div>
+  {% empty %}
+  <p class="text-center text-muted">No dispensing history available.</p>
+  {% endfor %}
+
+  <!-- Pagination -->
+  <div class="pagination mt-3">
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if history.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ history.previous_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+        {% endif %}
+        {% for num in history.paginator.page_range %}
+          <li class="page-item {% if history.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}">{{ num }}</a>
+          </li>
+        {% endfor %}
+        {% if history.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ history.next_page_number }}{% if request.GET.search_query %}&search_query={{ request.GET.search_query }}{% endif %}" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
 </div>
 {% endblock %}
