@@ -210,41 +210,33 @@ def dispense_medication_view(request):
                 procedure = request.POST.get("procedure", "")
                 procedure_cost = Decimal(request.POST.get("procedure_cost", "0.0").strip() or "0.0")
                 consultation_charge = Decimal(request.POST.get("consultation_charge", "0.0").strip() or "0.0")
-                # Read the manually entered grand total value from the form
+                # Use the grand_total provided by the user
                 grand_total = Decimal(request.POST.get("grand_total", "0.0").strip() or "0.0")
-                
                 if len(medications) != len(quantities) or len(medications) != len(prices):
                     return JsonResponse({"status": "error", "message": "Mismatch between medications, quantities, and prices."})
                 if not (medications or procedure or consultation_charge):
                     return JsonResponse({"status": "error", "message": "Please add at least one medication or Procedure or Consultation."})
-                
                 total_medication_cost = Decimal(0)
                 medication_details = []
-                
                 with transaction.atomic():
                     for medication_id, quantity_str, price_str in zip(medications, quantities, prices):
                         try:
                             medication = get_object_or_404(Medication, id=medication_id)
                             quantity = Decimal(quantity_str)
                             price_per_unit = Decimal(price_str)
-                            
                             if quantity <= 0 or price_per_unit < 0:
                                 return JsonResponse({"status": "error", "message": "Quantity and price must be positive numbers."})
-                            
                             if medication.quantity >= quantity:
                                 medication.quantity -= quantity
                                 medication.save()
-                                
                                 cost = quantity * price_per_unit
                                 total_medication_cost += cost
-                                
                                 medication_details.append({
                                     "name": medication.name,
                                     "quantity": float(quantity),
                                     "price": float(price_per_unit),
                                     "cost": float(cost)
                                 })
-                                
                                 DispensedMedication.objects.create(
                                     patient=patient,
                                     medication=medication,
@@ -258,32 +250,26 @@ def dispense_medication_view(request):
                             return JsonResponse({"status": "error", "message": "Invalid input for quantity or price."})
                         except Exception as e:
                             return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
-                    
-                    # Use the manually entered grand total as the final total cost
+                    # Use the user-entered grand_total as the final total cost
                     total_cost = grand_total
-                    
                     DispensedMedicationHistory.objects.create(
                         patient=patient,
-                        medication_details=medication_details,  # Medication details stored as a JSON-compatible list
+                        medication_details=medication_details,
                         procedure=procedure,
                         procedure_cost=procedure_cost,
                         consultation_charge=consultation_charge,
                         total_cost=total_cost,
                         payment_method=request.POST.get("payment_method", "Cash")
                     )
-                    
                     Billing.objects.create(
                         patient=patient,
                         total_amount=total_cost,
                         description="Dispense Medications"
                     )
-                    
-                    return JsonResponse({"status": "success", "message": "Medications dispensed successfully."})
+                    return JsonResponse({"status": "success", "message": "Medications dispensed successfully.", "total_cost": str(total_cost)})
             except Exception as e:
                 return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
         return JsonResponse({"status": "error", "message": "Invalid action."})
-    
-    # Render the form for dispensing medication (GET request)
     medications = Medication.objects.all()
     patients = Patient.objects.all()
     return render(request, "dispense_medication.html", {"medications": medications, "patients": patients})
