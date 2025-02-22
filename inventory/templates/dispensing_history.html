@@ -8,63 +8,91 @@
   <form method="get" action="" class="mb-4">
     <div class="row g-3">
       <div class="col-md-3">
-        <input type="date" name="from_date" class="form-control" placeholder="From Date" 
+        <label for="from_date" class="form-label">From Date</label>
+        <input type="date" name="from_date" id="from_date" class="form-control"
                value="{{ request.GET.from_date|default:'' }}">
       </div>
       <div class="col-md-3">
-        <input type="date" name="to_date" class="form-control" placeholder="To Date" 
+        <label for="from_time" class="form-label">From Time</label>
+        <input type="time" name="from_time" id="from_time" class="form-control"
+               value="{{ request.GET.from_time|default:'' }}">
+      </div>
+      <div class="col-md-3">
+        <label for="to_date" class="form-label">To Date</label>
+        <input type="date" name="to_date" id="to_date" class="form-control"
                value="{{ request.GET.to_date|default:'' }}">
       </div>
-      <div class="col-md-4">
-        <input type="text" name="search" class="form-control" placeholder="Search Patient" 
+      <div class="col-md-3">
+        <label for="to_time" class="form-label">To Time</label>
+        <input type="time" name="to_time" id="to_time" class="form-control"
+               value="{{ request.GET.to_time|default:'' }}">
+      </div>
+    </div>
+
+    <div class="row g-3 mt-2">
+      <div class="col-md-6">
+        <input type="text" name="search" class="form-control" placeholder="Search Patient"
                value="{{ request.GET.search|default:'' }}">
       </div>
-      <div class="col-md-2">
+      <div class="col-md-3">
         <button type="submit" class="btn btn-primary w-100">Filter/Search</button>
+      </div>
+      <div class="col-md-3">
+        <a href="?" class="btn btn-secondary w-100">Clear Filters</a>
       </div>
     </div>
   </form>
 
-  <!-- Display Date Range and Search Query -->
-  {% if from_date and to_date %}
-    <p class="text-muted text-center">Showing results from <strong>{{ from_date }}</strong> to <strong>{{ to_date }}</strong></p>
-  {% endif %}
-  {% if search_query %}
-    <p class="text-muted text-center">Showing results for "<strong>{{ search_query }}</strong>"</p>
-  {% endif %}
+<!-- Display Date & Time Range -->
+{% if from_date and to_date %}
+  <p class="text-muted text-center">
+    Showing results from <strong>{{ from_date }}</strong> at <strong>{{ from_time|default:"00:00" }}</strong>
+    to <strong>{{ to_date }}</strong> at <strong>{{ to_time|default:"23:59" }}</strong>
+  </p>
+{% endif %}
+{% if search_query %}
+  <p class="text-muted text-center">Showing results for "<strong>{{ search_query }}</strong>"</p>
+{% endif %}
 
   <!-- Dispensing History Summary -->
   {% if history %}
-  <div class="card mb-4">
-    <div class="card-header">
-      <h5 class="card-title">Summary of Costs</h5>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-4">
-          <p><strong>Total Medication Cost:</strong> {{ total_medication_cost|default:"0.00"|floatformat:2 }}</p>
-        </div>
-        <div class="col-md-4">
-          <p><strong>Total Procedure Cost:</strong> {{ total_procedure_cost|default:"0.00"|floatformat:2 }}</p>
-        </div>
-        <div class="col-md-4">
-          <p><strong>Total Consultation Cost:</strong> {{ total_consultation_cost|default:"0.00"|floatformat:2 }}</p>
-        </div>
+<div class="card mb-4 shadow-sm">
+  <div class="card-header" style="background-color: #F8BBD0; color: black; font-family: 'Ginto', sans-serif; font-weight: bold;">
+    <h5 class="mb-0">Summary of Costs</h5>
+</div>
+  <div class="card-body">
+    <div class="row text-center">
+      <div class="col-md-4">
+        <p class="fw-bold">Total Medication Cost</p>
+        <p class="text-muted">₹{{ total_medication_cost|default:"0.00"|floatformat:2 }}</p>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <p><strong>Total Cost:</strong> {{ total_cost|default:"0.00"|floatformat:2 }}</p>
-        </div>
-        <div class="col-md-4">
-          <p><strong>Total Collected via Cash:</strong> {{ total_cash|default:"0.00"|floatformat:2 }}</p>
-        </div>
-        <div class="col-md-4">
-          <p><strong>Total Collected via UPI:</strong> {{ total_upi|default:"0.00"|floatformat:2 }}</p>
-        </div>
+      <div class="col-md-4">
+        <p class="fw-bold">Total Procedure Cost</p>
+        <p class="text-muted">₹{{ total_procedure_cost|default:"0.00"|floatformat:2 }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="fw-bold">Total Consultation Cost</p>
+        <p class="text-muted">₹{{ total_consultation_cost|default:"0.00"|floatformat:2 }}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row text-center">
+      <div class="col-md-4">
+        <p class="fw-bold">Total Cost</p>
+        <p class="text-muted">₹{{ total_cost|default:"0.00"|floatformat:2 }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="fw-bold">Total Collected via Cash</p>
+        <p class="text-muted">₹{{ total_cash|default:"0.00"|floatformat:2 }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="fw-bold">Total Collected via UPI</p>
+        <p class="text-muted">₹{{ total_upi|default:"0.00"|floatformat:2 }}</p>
       </div>
     </div>
   </div>
-  {% endif %}
+</div>
+{% endif %}
 
   <!-- Dispensing History List -->
   {% for patient, records in history %}

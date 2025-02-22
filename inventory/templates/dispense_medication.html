@@ -36,7 +36,7 @@
           <!-- Medication Fields (added dynamically) -->
           <div id="medication-fields"></div>
 
-          <!-- Button to add medication fields -->
+          <!-- Button to Add Medication Field -->
           <button type="button" id="add-medication" class="btn btn-outline-primary mt-4">
             Add Medication
           </button>
@@ -55,7 +55,7 @@
             <input type="number" name="consultation_charge" id="consultation_charge" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
           </div>
 
-          <!-- New Payment Fields for Partial Payments -->
+          <!-- Partial Payment Fields -->
           <div class="form-group mt-3">
             <label for="cash_amount" class="form-label">Cash Payment (₹):</label>
             <input type="number" name="cash_amount" id="cash_amount" class="form-control shadow-sm" min="0" value="0.0" step="0.01">
@@ -106,7 +106,9 @@
         <select name="medications[]" class="form-control shadow-sm medication-select" required>
           <option value="" disabled selected>Choose a medication</option>
           {% for medication in medications %}
-            <option value="{{ medication.id }}">{{ medication.name }} ({{ medication.quantity }} in stock)</option>
+            <option value="{{ medication.id }}" data-price="{{ medication.price }}" data-expiry="{{ medication.expiry_date }}">
+              {{ medication.name }} ({{ medication.quantity }} in stock, Exp: {{ medication.expiry_date }})
+              </option>
           {% endfor %}
         </select><br><br>
         <label class="form-label">Quantity:</label>
@@ -114,7 +116,7 @@
         <label class="form-label">Price per Unit (₹):</label>
         <input type="number" name="prices[]" class="form-control shadow-sm price-input" min="0" step="0.01" required placeholder="Enter price per unit"><br>
         <label class="form-label">Total (₹):</label>
-        <input type="text" class="form-control shadow-sm total-field" value="₹0.00" readonly><br>
+        <input type="text" class="form-control shadow-sm total-field" value="₹0.00"><br>
         <!-- Remove Button -->
         <button type="button" class="btn btn-danger btn-sm mt-2 remove-medication">Remove</button>
       </div>
@@ -128,6 +130,18 @@
     });
   });
 
+  // When a medication is selected, auto-populate the price field from the data-price attribute
+  $(document).on('change', '.medication-select', function() {
+    var selectedPrice = $(this).find('option:selected').data('price');
+    if (selectedPrice !== undefined) {
+      // Set the price input within the same medication field
+      $(this).closest('.medication-field').find('.price-input').val(selectedPrice);
+      // Update field total and grand total
+      updateFieldTotal($(this).closest('.medication-field')[0]);
+      updateGrandTotal();
+    }
+  });
+
   // Function to update the total for a single medication field
   function updateFieldTotal(medicationField) {
     const quantity = parseFloat(medicationField.querySelector('.quantity-input').value || 0);
@@ -138,22 +152,53 @@
     updateGrandTotal();
   }
 
-  // Function to update grand total for all fields
+  // Update grand total for all medications, procedure, and consultation
   function updateGrandTotal() {
     let grandTotal = 0;
+
+    // Calculate total from fields with class 'total-field'
     document.querySelectorAll('.total-field').forEach(field => {
-      const value = parseFloat(field.value.replace('₹', '') || 0);
-      grandTotal += value;
+        const value = parseFloat(field.value.replace('₹', '') || 0);
+        grandTotal += value;
     });
+
+    // Add procedure cost and consultation charge
     const procedureCost = parseFloat(document.getElementById('procedure_cost').value || 0);
     const consultationCharge = parseFloat(document.getElementById('consultation_charge').value || 0);
     grandTotal += procedureCost + consultationCharge;
-    // Update the editable grand total field
-    document.getElementById('grand_total').value = grandTotal.toFixed(2);
-  }
 
-  // Event delegation for dynamic medication fields
+    // Update grand total field
+    document.getElementById('grand_total').value = grandTotal.toFixed(2);
+
+    // Validate cash and UPI payments
+    validatePayments(grandTotal);
+}
+
+function validatePayments(grandTotal) {
+    const cashAmount = parseFloat(document.getElementById('cash_amount').value || 0);
+    const upiAmount = parseFloat(document.getElementById('upi_amount').value || 0);
+    const totalPaid = cashAmount + upiAmount;
+
+    if (totalPaid > grandTotal) {
+        alert("Total payment (Cash + UPI) cannot exceed the Grand Total.");
+        document.getElementById('cash_amount').value = '';
+        document.getElementById('upi_amount').value = '';
+    }
+}
+
+// Attach validation to cash and UPI fields
+document.getElementById('cash_amount').addEventListener('input', () => validatePayments(parseFloat(document.getElementById('grand_total').value || 0)));
+document.getElementById('upi_amount').addEventListener('input', () => validatePayments(parseFloat(document.getElementById('grand_total').value || 0)));
+
+
+  // Event delegation for dynamic medication fields: input and change events
   document.getElementById('medication-fields').addEventListener('input', function (e) {
+    if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
+      updateFieldTotal(e.target.closest('.medication-field'));
+    }
+    updateGrandTotal();
+  });
+  document.getElementById('medication-fields').addEventListener('change', function (e) {
     if (e.target.classList.contains('quantity-input') || e.target.classList.contains('price-input')) {
       updateFieldTotal(e.target.closest('.medication-field'));
     }
@@ -171,6 +216,34 @@
   // Event listeners for procedure and consultation cost changes
   document.getElementById('procedure_cost').addEventListener('input', updateGrandTotal);
   document.getElementById('consultation_charge').addEventListener('input', updateGrandTotal);
+  function checkMedicationExpiry() {
+    const today = new Date();
+    const warningDays = 30; // Set threshold for warning (30 days)
+
+    document.querySelectorAll('.medication-row').forEach(row => {
+        const expiryDateStr = row.querySelector('.expiry-date').textContent;
+        const expiryDate = new Date(expiryDateStr);
+
+        if (isNaN(expiryDate)) return; // Skip invalid dates
+
+        const timeDiff = expiryDate - today;
+        const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+
+        if (daysLeft <= 0) {
+            row.style.backgroundColor = "#ffcccc"; // Red for expired
+            row.querySelector('.expiry-warning').textContent = "⚠ Expired";
+        } else if (daysLeft <= warningDays) {
+            row.style.backgroundColor = "#fff4cc"; // Yellow for near expiry
+            row.querySelector('.expiry-warning').textContent = `⚠ Expires in ${daysLeft} days`;
+        } else {
+            row.style.backgroundColor = ""; // Reset color
+            row.querySelector('.expiry-warning').textContent = "";
+        }
+    });
+}
+
+// Run on page load or when medication data updates
+document.addEventListener("DOMContentLoaded", checkMedicationExpiry);
 
   // Form submission via AJAX
   document.getElementById('dispense-form').addEventListener('submit', function (e) {
@@ -191,7 +264,7 @@
       if (data.status === "success") {
         statusMessage.textContent = data.message;
         statusMessage.style.color = "green";
-        // Reset the form
+        // Reset the form and fields
         this.reset();
         document.getElementById('medication-fields').innerHTML = '';
         document.getElementById('grand_total').value = "0.00";

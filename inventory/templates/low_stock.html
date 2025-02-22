@@ -4,48 +4,57 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="low-stock-heading">Low Stock Medicines</h1>
-                        <p class="lead-text">These are the medicines running low on stock. Please replenish them soon.</p>
-                        <hr class="hr-style">
-                    </div>
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+          <!-- Header Section -->
+          <div class="text-center mb-4">
+            <h1 class="low-stock-heading">Low Stock and Expiry Near Medicines</h1>
+            <p class="lead-text">These are the medicines running low on stock and near expiry.</p>
+            <hr class="hr-style">
+          </div>
 
-                    <!-- Table for Low Stock -->
-                    {% if medications %}
-                    <div class="table-responsive mt-4">
-                        <table class="table table-bordered table-hover shadow-sm">
-                            <thead class="table-heading">
-                                <tr>
-                                    <th>Medication Name</th>
-                                    <th>Quantity</th>
-                                    <th>MR Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for medication in medications %}
-                                <tr>
-                                    <td>{{ medication.name }}</td>
-                                    <td>{{ medication.quantity }}</td>
-                                    <td>{{ medication.mr_number }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="2" class="text-center-custom">No low stock medicines available.</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <p class="low-stock-heading text-center-custom mt-4">No medicines with low stock!</p>
-                    {% endif %}
-                </div>
+          <!-- Table for Low Stock -->
+          {% if medications %}
+            <div class="table-responsive mt-4">
+              <table class="table table-bordered table-hover shadow-sm">
+                <thead class="table-heading">
+                  <tr>
+                    <th>Medication Name</th>
+                    <th>Quantity</th>
+                    <th>MR Details</th>
+                    <th>Expiry Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for medication in medications %}
+                  <tr>
+                    <td>{{ medication.name }}</td>
+                    <td>{{ medication.quantity }}</td>
+                    <td>{{ medication.mr_number }}</td>
+                    <td>
+                      {% if medication.expiry_date %}
+                        {{ medication.expiry_date|date:"d/m/Y" }}
+                      {% else %}
+                        N/A
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center-custom">No low stock medicines available.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
             </div>
+          {% else %}
+            <p class="low-stock-heading text-center-custom mt-4">No medicines with low stock!</p>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

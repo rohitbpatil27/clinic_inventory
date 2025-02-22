@@ -4,63 +4,68 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="available-stock-heading">Available Stock</h1>
-                        <p class="lead-text">Categorized by Company Name</p>
-                        <hr class="hr-style">
-                    </div>
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+          <!-- Header Section -->
+          <div class="text-center mb-4">
+            <h1 class="available-stock-heading">Available Stock</h1>
+            <p class="lead-text">Categorized by Company Name</p>
+            <hr class="hr-style">
+          </div>
 
-                    <!-- Search Bar -->
-                    <form method="GET" action="{% url 'available_stock' %}" class="mb-4">
-                        <div class="input-group">
-                            <input 
-                                type="text" 
-                                name="search" 
-                                class="form-control shadow-sm" 
-                                placeholder="Search by medication name or company name..." 
-                                value="{{ search_query }}" 
-                                aria-label="Search">
-                            <button class="btn btn-custom" type="submit">Search</button>
-                        </div>
-                    </form>
-
-                    <!-- Table for Available Stock -->
-                    {% if grouped_medications %}
-                        {% for company, medications in grouped_medications.items %}
-                        <h3 class="mt-4 available-stock-heading">{{ company }}</h3>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover shadow-sm">
-                                <thead class="table-heading">
-                                    <tr>
-                                        <th>Medication Name</th>
-                                        <th>Quantity</th>
-                                        <th>Added Date/Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for medication in medications %}
-                                    <tr>
-                                        <td>{{ medication.name }}</td>
-                                        <td>{{ medication.quantity }}</td>
-                                        <td>{{ medication.date_added }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                    <div class="text-center mt-4">
-                        <p class="text-muted">No medications match your search criteria.</p>
-                    </div>
-                    {% endif %}
-                </div>
+          <!-- Search Bar -->
+          <form method="GET" action="{% url 'available_stock' %}" class="mb-4">
+            <div class="input-group">
+              <input type="text" name="search" class="form-control shadow-sm" placeholder="Search by medication name or company name..." value="{{ search_query }}" aria-label="Search">
+              <button class="btn btn-custom" type="submit">Search</button>
             </div>
+          </form>
+
+          <!-- Table for Available Stock -->
+          {% if grouped_medications %}
+            {% for company, medications in grouped_medications.items %}
+              <h3 class="mt-4 available-stock-heading">{{ company }}</h3>
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover shadow-sm">
+                  <thead class="table-heading">
+                    <tr>
+                      <th>Medication Name</th>
+                      <th>Quantity</th>
+                      <th>Price (₹)</th>
+                      <th>Expiry Date</th>
+                      <th>Added Date/Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for medication in medications %}
+                    <tr>
+                      <td>{{ medication.name }}</td>
+                      <td>{{ medication.quantity }}</td>
+                      <td>{{ medication.price }}</td>
+                      <td>
+                        {% if medication.expiry_date %}
+                          {{ medication.expiry_date|date:"d/m/Y" }}
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      </td>
+                      <td>{{ medication.date_added|date:"d/m/Y h:i A" }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center mt-4">
+              <p class="text-muted">No medications match your search criteria.</p>
+            </div>
+          {% endif %}
         </div>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

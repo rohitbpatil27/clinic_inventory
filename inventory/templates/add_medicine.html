@@ -4,96 +4,132 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg border-0">
-                <div class="card-body p-4">
-                    <h1 class="text-center add-medicine-heading">Manage Medicines</h1>
-                    <hr class="hr-style mb-4">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-4">
+          <h1 class="text-center add-medicine-heading">Manage Medicines</h1>
+          <hr class="hr-style mb-4">
 
-                    <!-- Display success messages -->
-                    {% if messages %}
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endif %}
-
-                    <form method="POST" class="mt-4">
-                        {% csrf_token %}
-
-                        <div class="form-group">
-                            <label for="medicine" class="form-label">Choose Medicine:</label>
-                            <select id="medicine" name="medicine" class="form-control" required>
-                                <option value="">-- Select Medicine --</option>
-                                <option value="new">Add New Medicine</option>
-                                {% for medicine in medicines %}
-                                    <option value="{{ medicine.id }}" data-name="{{ medicine.name }}" data-company="{{ medicine.company_name }}" data-mr="{{ medicine.mr_number }}" data-quantity="{{ medicine.quantity }}">{{ medicine.name }} ({{ medicine.company_name }})</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-
-                        <div class="form-group mt-3">
-                            <label for="name" class="form-label">Medicine Name:</label>
-                            <input type="text" id="name" name="name" class="form-control" placeholder="Enter the medicine name" required>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label for="quantity" class="form-label">Quantity:</label>
-                            <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Enter the quantity" required>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label for="company_name" class="form-label">Company Name:</label>
-                            <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Enter the company name" required>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label for="mr_number" class="form-label">MR Number:</label>
-                            <input type="text" id="mr_number" name="mr_number" class="form-control" placeholder="Enter the MR Name and Number" required>
-                        </div>
-
-                        <div class="form-group mt-4 text-center">
-                            <button type="submit" name="action" value="add_or_update" class="btn btn-submit btn-lg">Add or Update Medicine</button>
-                            <button type="submit" name="action" value="delete" class="btn btn-danger btn-lg">Delete Medicine</button>
-                        </div>
-                    </form>
+          <!-- Display success messages -->
+          {% if messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                  {{ message }}
                 </div>
+              {% endfor %}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
+          {% endif %}
+
+          <form method="POST" class="mt-4">
+            {% csrf_token %}
+
+            <!-- Medicine Dropdown with Select2 -->
+            <div class="form-group">
+              <label for="medicine" class="form-label">Choose Medicine:</label>
+              <select id="medicine" name="medicine" class="form-control" required>
+                <option value="">-- Select Medicine --</option>
+                <option value="new">Add New Medicine</option>
+                {% for medicine in medicines %}
+                  <option value="{{ medicine.id }}"
+                          data-name="{{ medicine.name }}"
+                          data-company="{{ medicine.company_name }}"
+                          data-mr="{{ medicine.mr_number }}"
+                          data-quantity="{{ medicine.quantity }}"
+                          data-expiry="{{ medicine.expiry_date|date:'Y-m-d' }}">
+                    {{ medicine.name }} ({{ medicine.company_name }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Medicine Name Field -->
+            <div class="form-group mt-3">
+              <label for="name" class="form-label">Medicine Name:</label>
+              <input type="text" id="name" name="name" class="form-control" placeholder="Enter the medicine name" required>
+            </div>
+
+            <!-- Quantity Field -->
+            <div class="form-group mt-3">
+              <label for="quantity" class="form-label">Quantity:</label>
+              <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Enter the quantity" required>
+            </div>
+
+            <!-- Company Name Field -->
+            <div class="form-group mt-3">
+              <label for="company_name" class="form-label">Company Name:</label>
+              <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Enter the company name" required>
+            </div>
+
+            <!-- MR Details Field -->
+            <div class="form-group mt-3">
+              <label for="mr_number" class="form-label">MR Details:</label>
+              <input type="text" id="mr_number" name="mr_number" class="form-control" placeholder="Enter the MR Name and Number" required>
+            </div>
+
+            <!-- Expiry Date Field -->
+            <div class="form-group mt-3">
+              <label for="expiry_date" class="form-label">Expiry Date:</label>
+              <input type="date" id="expiry_date" name="expiry_date" class="form-control">
+            </div>
+
+            <!-- New Price per Unit Field -->
+            <div class="form-group mt-3">
+              <label for="price" class="form-label">Price per Unit (₹):</label>
+              <input type="number" id="price" name="price" class="form-control" placeholder="Enter price per unit" step="0.01" required>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-group mt-4 text-center">
+              <button type="submit" name="action" value="add_or_update" class="btn btn-submit btn-lg">Add or Update Medicine</button>
+              <button type="submit" name="action" value="delete" class="btn btn-danger btn-lg">Delete Medicine</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Include jQuery and Select2 JavaScript libraries -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 <!-- Initialize select2 for search functionality and auto-populate fields -->
 <script>
-    $(document).ready(function() {
-        // Initialize select2 for search
-        $('#medicine').select2({
-            placeholder: "Search or select a medicine",
-            allowClear: true, // Allows clearing selection
-            width: "100%", // Ensures dropdown fits container
-        }).next(".select2-container").addClass("form-control");
+  $(document).ready(function() {
+    // Initialize select2 for the medicine dropdown with search capability
+    $('#medicine').select2({
+      placeholder: "Search or select a medicine",
+      allowClear: true,
+      width: "100%"
+    }).next(".select2-container").addClass("form-control");
 
-        // Auto-populate fields based on selected medicine
-        $('#medicine').change(function() {
-            var selectedMedicine = $(this).find('option:selected');
-            var medicineId = selectedMedicine.val();
+    // When a medicine is selected, auto-populate related fields
+    $('#medicine').change(function() {
+      var selectedMedicine = $(this).find('option:selected');
+      var medicineId = selectedMedicine.val();
 
-            // Check if 'Add New Medicine' is selected
-            if (medicineId === 'new') {
-                $('#name').val('');
-                $('#company_name').val('');
-                $('#mr_number').val('');
-                $('#quantity').val('');
-            } else {
-                // Auto-populate fields based on selected medicine
-                $('#name').val(selectedMedicine.data('name'));
-                $('#company_name').val(selectedMedicine.data('company'));
-                $('#mr_number').val(selectedMedicine.data('mr'));
-                $('#quantity').val(selectedMedicine.data('quantity'));
-            }
-        });
+      if (medicineId === 'new' || medicineId === "") {
+        // Clear all fields if "Add New Medicine" is selected or no selection
+        $('#name').val('');
+        $('#company_name').val('');
+        $('#mr_number').val('');
+        $('#quantity').val('');
+        $('#price').val('');
+        $('#expiry_date').val('');
+      } else {
+        // Populate fields with data attributes from the selected option
+        $('#name').val(selectedMedicine.data('name'));
+        $('#company_name').val(selectedMedicine.data('company'));
+        $('#mr_number').val(selectedMedicine.data('mr'));
+        $('#quantity').val(selectedMedicine.data('quantity'));
+        $('#price').val(selectedMedicine.data('price'));
+        $('#expiry_date').val(selectedMedicine.data('expiry'));  // Set expiry date
+      }
     });
+  });
 </script>
 {% endblock %}

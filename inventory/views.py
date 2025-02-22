@@ -8,7 +8,10 @@ from itertools import groupby
 from django.db.models import Q, Sum
 from django.core.paginator import Paginator
 from django.db import transaction  # For atomicity
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+from django.utils.dateparse import parse_date
+from datetime import datetime
+from django.utils.timezone import make_aware
 import logging
 logger = logging.getLogger(__name__)
 
@@ -42,14 +45,38 @@ def dashboard(request):
 @login_required
 def add_medicine(request):
     if request.method == "POST":
+        # Capture form data
         action = request.POST.get("action")  # Determines if it's add/update or delete
         medicine_id = request.POST.get("medicine")  # Selected medicine ID
         name = request.POST.get("name")  # Medicine name
         company_name = request.POST.get("company_name")  # Company name
-        quantity = request.POST.get("quantity")  # Quantity
+        quantity = request.POST.get("quantity")  # Quantity as string
         mr_number = request.POST.get("mr_number")  # MR number
+        price_str = request.POST.get("price")  # Price per unit (as string)
+        expiry_date_str = request.POST.get("expiry_date")  # Expiry date (as string, expected in YYYY-MM-DD format)
 
-        # Handle Delete Operation
+        # Parse expiry date (if provided)
+        expiry_date = parse_date(expiry_date_str) if expiry_date_str else None
+
+        # Validate quantity
+        try:
+            quantity = int(quantity)
+            if quantity <= 0:
+                raise ValueError("Quantity must be greater than zero.")
+        except ValueError:
+            messages.error(request, "Invalid quantity. Please enter a valid number greater than zero.")
+            return redirect("add_medicine")
+
+        # Validate and parse price
+        try:
+            price = Decimal(price_str.strip())
+            if price < 0:
+                raise ValueError("Price must be non-negative.")
+        except Exception:
+            messages.error(request, "Invalid price. Please enter a valid number.")
+            return redirect("add_medicine")
+
+        # Handle delete operation
         if action == "delete":
             if medicine_id and medicine_id != "new":
                 try:
@@ -64,16 +91,7 @@ def add_medicine(request):
                 messages.error(request, "Please select a valid medicine to delete.")
             return redirect("add_medicine")
 
-        # Validate quantity for add/update operations
-        try:
-            quantity = int(quantity)
-            if quantity <= 0:
-                raise ValueError("Quantity must be greater than zero.")
-        except ValueError:
-            messages.error(request, "Invalid quantity. Please enter a valid number greater than zero.")
-            return redirect("add_medicine")
-
-        # Handle "new" medicine creation
+        # Handle new medicine creation
         if medicine_id == "new":
             try:
                 Medication.objects.create(
@@ -81,6 +99,8 @@ def add_medicine(request):
                     company_name=company_name,
                     quantity=quantity,
                     mr_number=mr_number,
+                    price=price,
+                    expiry_date=expiry_date,
                 )
                 messages.success(request, "New medicine added successfully!")
             except Exception as e:
@@ -91,23 +111,24 @@ def add_medicine(request):
         else:
             try:
                 medication = Medication.objects.get(id=int(medicine_id))
-                medication.quantity += quantity  # Update quantity
+                medication.quantity += quantity  # Increase quantity
                 medication.name = name  # Optionally update name
                 medication.company_name = company_name  # Optionally update company name
                 medication.mr_number = mr_number  # Optionally update MR number
+                medication.price = price  # Update price per unit
+                medication.expiry_date = expiry_date  # Update expiry date
                 medication.save()
-
                 messages.success(request, f"Stock for {medication.name} updated successfully!")
             except Medication.DoesNotExist:
                 messages.error(request, "Selected medicine does not exist.")
             except Exception as e:
                 messages.error(request, f"Failed to update medicine: {str(e)}")
+            return redirect("add_medicine")
 
-        return redirect("add_medicine")
-
-    # Render the form for adding, updating, or deleting medicine if GET request
+    # For GET request, pass all medicines to the template for updating purposes
     medicines = Medication.objects.all()
     return render(request, "add_medicine.html", {"medicines": medicines})
+
 
 @login_required
 def low_stock(request):
@@ -119,7 +140,7 @@ def available_stock(request):
     query = request.GET.get("search", "")  # Get the search query
     if query:
         medications = Medication.objects.filter(
-            Q(name__icontains=query) | Q(company_name__icontains=query), 
+            Q(name__icontains=query) | Q(company_name__icontains=query),
             quantity__gt=0
         )
     else:
@@ -200,29 +221,41 @@ def dispense_medication_view(request):
             return JsonResponse({"status": "error", "message": "Action is required."})
         if action == "dispense_medication":
             try:
+                # Retrieve and validate patient
                 patient_id = request.POST.get("patient_id")
                 if not patient_id:
                     return JsonResponse({"status": "error", "message": "Please select a patient."})
                 patient = get_object_or_404(Patient, id=patient_id)
+
+                # Retrieve lists of medications, quantities, and prices
                 medications = request.POST.getlist("medications[]")
                 quantities = request.POST.getlist("quantities[]")
                 prices = request.POST.getlist("prices[]")
+
+                # Retrieve optional fields and convert to Decimal (defaulting to 0.0)
                 procedure = request.POST.get("procedure", "")
-                procedure_cost = Decimal(request.POST.get("procedure_cost", "0.0").strip() or "0.0")
-                consultation_charge = Decimal(request.POST.get("consultation_charge", "0.0").strip() or "0.0")
-                cash_amount = Decimal(request.POST.get("cash_amount", "0.0").strip() or "0.0")
-                upi_amount = Decimal(request.POST.get("upi_amount", "0.0").strip() or "0.0")
-                # Use the grand total from the form (manually entered/edited)
-                grand_total = Decimal(request.POST.get("grand_total", "0.0").strip() or "0.0")
-                
+                try:
+                    procedure_cost = Decimal(request.POST.get("procedure_cost", "0.0").strip() or "0.0")
+                    consultation_charge = Decimal(request.POST.get("consultation_charge", "0.0").strip() or "0.0")
+                    cash_amount = Decimal(request.POST.get("cash_amount", "0.0").strip() or "0.0")
+                    upi_amount = Decimal(request.POST.get("upi_amount", "0.0").strip() or "0.0")
+                    # Retrieve manually entered grand total
+                    grand_total = Decimal(request.POST.get("grand_total", "0.0").strip() or "0.0")
+                except (InvalidOperation, ValueError):
+                    return JsonResponse({"status": "error", "message": "Invalid cost values. Please enter valid numbers."})
+
+                # Check that lists have matching lengths
                 if len(medications) != len(quantities) or len(medications) != len(prices):
                     return JsonResponse({"status": "error", "message": "Mismatch between medications, quantities, and prices."})
+
+                # Ensure at least one medication or one of procedure/consultation is provided
                 if not (medications or procedure or consultation_charge):
                     return JsonResponse({"status": "error", "message": "Please add at least one medication or Procedure or Consultation."})
-                
+
                 total_medication_cost = Decimal(0)
                 medication_details = []
 
+                # Process each medication within an atomic transaction
                 with transaction.atomic():
                     for medication_id, quantity_str, price_str in zip(medications, quantities, prices):
                         try:
@@ -234,14 +267,17 @@ def dispense_medication_view(request):
                             if medication.quantity >= quantity:
                                 medication.quantity -= quantity
                                 medication.save()
-                                cost = quantity * price_per_unit
+
+                                cost = (quantity * price_per_unit).quantize(Decimal("0.01"))
                                 total_medication_cost += cost
+
                                 medication_details.append({
                                     "name": medication.name,
                                     "quantity": float(quantity),
                                     "price": float(price_per_unit),
                                     "cost": float(cost)
                                 })
+
                                 DispensedMedication.objects.create(
                                     patient=patient,
                                     medication=medication,
@@ -251,25 +287,27 @@ def dispense_medication_view(request):
                                 )
                             else:
                                 return JsonResponse({"status": "error", "message": f"Not enough stock for {medication.name}."})
-                        except ValueError:
+                        except (InvalidOperation, ValueError):
                             return JsonResponse({"status": "error", "message": "Invalid input for quantity or price."})
                         except Exception as e:
                             return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
-                    
-                    # Use the manually entered grand_total as the final total cost
-                    total_cost = grand_total
 
+                    # Use the manually entered grand_total as the final total cost, quantized to 2 decimal places
+                    total_cost = grand_total.quantize(Decimal("0.01"))
+
+                    # Create history record using the provided totals and partial payment details
                     DispensedMedicationHistory.objects.create(
                         patient=patient,
                         medication_details=medication_details,
                         procedure=procedure,
-                        procedure_cost=procedure_cost,
-                        consultation_charge=consultation_charge,
+                        procedure_cost=procedure_cost.quantize(Decimal("0.01")),
+                        consultation_charge=consultation_charge.quantize(Decimal("0.01")),
                         total_cost=total_cost,
-                        cash_amount=cash_amount,
-                        upi_amount=upi_amount,
+                        cash_amount=cash_amount.quantize(Decimal("0.01")),
+                        upi_amount=upi_amount.quantize(Decimal("0.01")),
                     )
 
+                    # Create billing record
                     Billing.objects.create(
                         patient=patient,
                         total_amount=total_cost,
@@ -285,81 +323,89 @@ def dispense_medication_view(request):
             except Exception as e:
                 return JsonResponse({"status": "error", "message": f"An error occurred: {e}"})
         return JsonResponse({"status": "error", "message": "Invalid action."})
+
+    # For GET requests, render the form with available patients and medications
     medications = Medication.objects.all()
     patients = Patient.objects.all()
     return render(request, "dispense_medication.html", {"medications": medications, "patients": patients})
 
+
 @login_required
 def dispensing_history_view(request):
+    # Check if the user wants to clear filters
+    if 'clear_filters' in request.GET:
+        return redirect('dispensing_history')  # Redirect to reset filters
+
     # Fetch filters from request
     search_query = request.GET.get('search', '').strip()
     from_date = request.GET.get('from_date')
     to_date = request.GET.get('to_date')
+    from_time = request.GET.get('from_time', '00:00')  # Default to midnight
+    to_time = request.GET.get('to_time', '23:59')  # Default to end of day
+
+    # Convert date and time to datetime objects
+    try:
+        if from_date:
+            from_datetime = make_aware(datetime.strptime(f"{from_date} {from_time}", "%Y-%m-%d %H:%M"))
+        if to_date:
+            to_datetime = make_aware(datetime.strptime(f"{to_date} {to_time}", "%Y-%m-%d %H:%M"))
+    except ValueError:
+        logger.error(f"Invalid date/time input: {from_date} {from_time} - {to_date} {to_time}")
+        from_datetime, to_datetime = None, None
 
     # Get all history records ordered by dispensed date
-    all_history = (
-        DispensedMedicationHistory.objects.select_related('patient')
-        .order_by('-date_dispensed')
-    )
+    all_history = DispensedMedicationHistory.objects.select_related('patient').order_by('-date_dispensed')
 
-    # Apply search query filter on patient name or contact (if available)
+    # Apply search filter
     if search_query:
         all_history = all_history.filter(
             Q(patient__name__icontains=search_query) |
             Q(patient__contact__icontains=search_query)
         )
 
-    # Apply date range filter if both dates are provided
+    # Apply datetime range filter
     if from_date and to_date:
-        try:
-            all_history = all_history.filter(date_dispensed__date__range=[from_date, to_date])
-        except ValueError:
-            logger.error(f"Invalid date range: {from_date} to {to_date}")
+        all_history = all_history.filter(date_dispensed__range=[from_datetime, to_datetime])
 
-    # Initialize total sums (as Decimal)
+    # Calculate totals
     total_medication_cost = Decimal(0)
     total_procedure_cost = Decimal(0)
     total_consultation_cost = Decimal(0)
     total_cost = Decimal(0)
 
-    # Group records by patient
     grouped_history = {}
     for record in all_history:
-        # medication_details is stored as JSON (a list of dicts)
-        if isinstance(record.medication_details, list):
-            medication_cost = sum(Decimal(medication.get('cost', 0)) for medication in record.medication_details)
-        else:
-            medication_cost = Decimal(0)
+        medication_cost = sum(Decimal(med.get('cost', 0)) for med in record.medication_details) if isinstance(record.medication_details, list) else Decimal(0)
 
         total_medication_cost += medication_cost
         total_procedure_cost += record.procedure_cost or Decimal(0)
         total_consultation_cost += record.consultation_charge or Decimal(0)
         total_cost += record.total_cost or Decimal(0)
 
-        if record.patient not in grouped_history:
-            grouped_history[record.patient] = []
-        grouped_history[record.patient].append(record)
+        grouped_history.setdefault(record.patient, []).append(record)
 
-    # Aggregate total cash and UPI amounts using the new fields
+    # Aggregate total cash and UPI amounts
     total_cash = all_history.aggregate(total=Sum("cash_amount"))["total"] or Decimal("0.00")
     total_upi = all_history.aggregate(total=Sum("upi_amount"))["total"] or Decimal("0.00")
 
-    # Paginate grouped history (grouped by patient)
+    # Paginate results
     grouped_history_list = list(grouped_history.items())
-    paginator = Paginator(grouped_history_list, 10)  # Show 10 patients per page
+    paginator = Paginator(grouped_history_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context = {
         'history': page_obj,
         'search_query': search_query,
+        'from_date': from_date,
+        'to_date': to_date,
+        'from_time': from_time,
+        'to_time': to_time,
         'total_medication_cost': total_medication_cost,
         'total_procedure_cost': total_procedure_cost,
         'total_consultation_cost': total_consultation_cost,
         'total_cost': total_cost,
         'total_cash': total_cash,
         'total_upi': total_upi,
-        'from_date': from_date,
-        'to_date': to_date,
     }
     return render(request, 'dispensing_history.html', context)
