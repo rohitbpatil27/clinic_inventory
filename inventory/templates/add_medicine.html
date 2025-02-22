@@ -38,7 +38,8 @@
                           data-company="{{ medicine.company_name }}"
                           data-mr="{{ medicine.mr_number }}"
                           data-quantity="{{ medicine.quantity }}"
-                          data-expiry="{{ medicine.expiry_date|date:'Y-m-d' }}">
+                          data-price="{{ medicine.price }}"
+                          data-expiry="{{ medicine.expiry_date|default:''|date:'Y-m-d' }}">
                     {{ medicine.name }} ({{ medicine.company_name }})
                   </option>
                 {% endfor %}

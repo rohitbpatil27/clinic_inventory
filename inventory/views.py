@@ -45,27 +45,27 @@ def dashboard(request):
 @login_required
 def add_medicine(request):
     if request.method == "POST":
-        # Capture form data
-        action = request.POST.get("action")  # Determines if it's add/update or delete
-        medicine_id = request.POST.get("medicine")  # Selected medicine ID
-        name = request.POST.get("name")  # Medicine name
-        company_name = request.POST.get("company_name")  # Company name
-        quantity = request.POST.get("quantity")  # Quantity as string
-        mr_number = request.POST.get("mr_number")  # MR number
-        price_str = request.POST.get("price")  # Price per unit (as string)
-        expiry_date_str = request.POST.get("expiry_date")  # Expiry date (as string, expected in YYYY-MM-DD format)
+        action = request.POST.get("action")
+        medicine_id = request.POST.get("medicine")
+        name = request.POST.get("name")
+        company_name = request.POST.get("company_name")
+        quantity_str = request.POST.get("quantity")  # Accept empty value
+        mr_number = request.POST.get("mr_number")
+        price_str = request.POST.get("price")
+        expiry_date_str = request.POST.get("expiry_date")
 
-        # Parse expiry date (if provided)
         expiry_date = parse_date(expiry_date_str) if expiry_date_str else None
 
-        # Validate quantity
-        try:
-            quantity = int(quantity)
-            if quantity <= 0:
-                raise ValueError("Quantity must be greater than zero.")
-        except ValueError:
-            messages.error(request, "Invalid quantity. Please enter a valid number greater than zero.")
-            return redirect("add_medicine")
+        # Validate and parse quantity (optional)
+        quantity = None
+        # if quantity_str:
+        #     try:
+        #         quantity = int(quantity_str)
+        #         if quantity < 0:
+        #             raise ValueError("Quantity cannot be negative.")
+        #     except ValueError:
+        #         messages.error(request, "Invalid quantity. Please enter a valid number.")
+        #         return redirect("add_medicine")
 
         # Validate and parse price
         try:
@@ -91,44 +91,54 @@ def add_medicine(request):
                 messages.error(request, "Please select a valid medicine to delete.")
             return redirect("add_medicine")
 
-        # Handle new medicine creation
-        if medicine_id == "new":
-            try:
-                Medication.objects.create(
-                    name=name,
-                    company_name=company_name,
-                    quantity=quantity,
-                    mr_number=mr_number,
-                    price=price,
-                    expiry_date=expiry_date,
-                )
-                messages.success(request, "New medicine added successfully!")
-            except Exception as e:
-                messages.error(request, f"Failed to add new medicine: {str(e)}")
+        # Handle add or update operation
+        if action == "add_or_update":
+            if medicine_id == "new":
+                # Create new medicine
+                try:
+                    Medication.objects.create(
+                        name=name,
+                        company_name=company_name,
+                        quantity=quantity if quantity is not None else 0,  # Default 0 if not provided
+                        mr_number=mr_number,
+                        price=price,
+                        expiry_date=expiry_date,
+                    )
+                    messages.success(request, "New medicine added successfully!")
+                except Exception as e:
+                    messages.error(request, f"Failed to add new medicine: {str(e)}")
+            else:
+                # Update existing medicine
+                try:
+                    medication = Medication.objects.get(id=int(medicine_id))
+
+                    # Only update fields if new values are provided
+                    if name:
+                        medication.name = name
+                    if company_name:
+                        medication.company_name = company_name
+                    if mr_number:
+                        medication.mr_number = mr_number
+                    if price:
+                        medication.price = price
+                    if expiry_date:
+                        medication.expiry_date = expiry_date
+
+                    # Update quantity only if it's provided
+                    if quantity is not None:
+                        medication.quantity += quantity
+
+                    medication.save()
+                    messages.success(request, f"Medicine '{medication.name}' updated successfully!")
+                except Medication.DoesNotExist:
+                    messages.error(request, "Selected medicine does not exist.")
+                except Exception as e:
+                    messages.error(request, f"Failed to update medicine: {str(e)}")
+
             return redirect("add_medicine")
 
-        # Handle updating existing medicine
-        else:
-            try:
-                medication = Medication.objects.get(id=int(medicine_id))
-                medication.quantity += quantity  # Increase quantity
-                medication.name = name  # Optionally update name
-                medication.company_name = company_name  # Optionally update company name
-                medication.mr_number = mr_number  # Optionally update MR number
-                medication.price = price  # Update price per unit
-                medication.expiry_date = expiry_date  # Update expiry date
-                medication.save()
-                messages.success(request, f"Stock for {medication.name} updated successfully!")
-            except Medication.DoesNotExist:
-                messages.error(request, "Selected medicine does not exist.")
-            except Exception as e:
-                messages.error(request, f"Failed to update medicine: {str(e)}")
-            return redirect("add_medicine")
-
-    # For GET request, pass all medicines to the template for updating purposes
     medicines = Medication.objects.all()
     return render(request, "add_medicine.html", {"medicines": medicines})
-
 
 @login_required
 def low_stock(request):
