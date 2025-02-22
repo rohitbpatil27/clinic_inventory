@@ -58,14 +58,14 @@ def add_medicine(request):
 
         # Validate and parse quantity (optional)
         quantity = None
-        # if quantity_str:
-        #     try:
-        #         quantity = int(quantity_str)
-        #         if quantity < 0:
-        #             raise ValueError("Quantity cannot be negative.")
-        #     except ValueError:
-        #         messages.error(request, "Invalid quantity. Please enter a valid number.")
-        #         return redirect("add_medicine")
+        if quantity_str:
+            try:
+                quantity = int(quantity_str)
+                if quantity < 0:
+                    raise ValueError("Quantity cannot be negative.")
+            except ValueError:
+                messages.error(request, "Invalid quantity. Please enter a valid number.")
+                return redirect("add_medicine")
 
         # Validate and parse price
         try:
