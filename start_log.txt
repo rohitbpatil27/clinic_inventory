@@ -1,0 +1,4 @@
+INFO:waitress:Serving on http://0.0.0.0:8000
+Not Found: /favicon.ico
+WARNING:django.request:Not Found: /favicon.ico
+^C
